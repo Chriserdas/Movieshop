@@ -1,0 +1,68 @@
+body {
+    padding: 0%;
+    margin: 0px; 
+    -webkit-app-region: drag;
+    -webkit-user-select: none;
+    background-color: #333333;
+}
+
+#title-bar{
+    background-color:#333333;
+    height:32px;
+
+}
+   
+#title-bar-btns {
+    -webkit-app-region: no-drag;
+    position: fixed;
+    top: 0px;
+}
+
+#maximize-button{
+    -webkit-app-region: no-drag;
+    top:-2px;
+    position:fixed;
+    right:41.5px;
+    height:34px;
+}
+
+#min-btn{
+    position:fixed;
+    -webkit-app-region: no-drag;
+    top:0px;
+    right:83.5px;
+}
+
+
+#close-button{
+    -webkit-app-region: no-drag;
+    position: fixed;
+    top: 0px;
+    right: 0px;
+}
+
+
+
+#min-btn, #close-btn,#maximize-button{
+    border: none;
+    color: white;
+    outline: none;
+    font-size: 21.6px;
+    display: inline-block;
+    padding: 3px 14px;
+    background-color: transparent;
+    font-weight: lighter;
+    -webkit-user-select: none;
+}
+
+
+
+
+#title-bar-btns :hover{
+    background-color: #4a4949;
+}
+
+
+#close-button :hover{
+    background-color: crimson;
+}
