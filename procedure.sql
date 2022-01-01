@@ -6,7 +6,7 @@ BEGIN
 
 IF(choice like 'm') THEN 
 
-SELECT title, film_id 
+SELECT film.title, film.film_id 
 FROM film INNER JOIN film_inventory ON film_inventory.film_id = film.film_id
 INNER JOIN film_rental ON film_rental.film_inventory_id = film_inventory.film_inventory_id
 WHERE film_rental.film_rental_date BETWEEN imerominia1 AND imerominia2
@@ -82,4 +82,31 @@ SELECT income1 + income2 AS esoda_toy_mhna;
 
 SET counter = counter+1;
 END WHILE;
+END
+
+
+--STORE 3.4A
+
+CREATE PROCEDURE get_actors(IN name1 VARCHAR(20), IN name2 VARCHAR(20) )
+BEGIN
+select first_name, last_name FROM actor
+WHERE last_name BETWEEN name1 AND name2
+ORDER BY last_name;
+SELECT found_rows();
+END
+
+--STORE 3.4B
+CREATE PROCEDURE get_actor1(IN name VARCHAR(20))
+BEGIN
+
+DECLARE plithos_same_actor INT;
+SELECT first_name,last_name FROM actor
+WHERE last_name LIKE name;
+SELECT found_rows() INTO plithos_same_actor;
+IF(plithos_same_actor > 0) THEN
+SELECT plithos_same_actor;
+ELSE(plithos_same_actor = 0) THEN
+SELECT 'NO SAME ACTOR WITH THIS LAST NAME';
+
+END IF;
 END
