@@ -169,7 +169,7 @@ create table episode_inventory(
 
 
 ------------------USERS---------------
-
+drop table if exists customer;
 CREATE TABLE customer (
     customer_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
     first_name VARCHAR(45) NOT NULL,
@@ -204,7 +204,7 @@ create table administrator(
 
 
 -------------------RENTAL-------------
-
+drop table if exists film_rental;
 create table film_rental (
     film_rental_id smallint NOT NULL AUTO_INCREMENT,
     film_rental_date DATETIME,
@@ -216,7 +216,7 @@ create table film_rental (
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-
+drop table if exists episode_rental;
 create table episode_rental(
     episode_rental_id SMALLINT UNSIGNED NOT NULL auto_increment,
     episode_rental_date DATETIME,
@@ -230,7 +230,7 @@ create table episode_rental(
 
 ------------------PAYMENT--------------
 
-
+drop table if exists film_payment;
 create table film_payment (
     film_payment_id smallint not null,
     customer_id smallint unsigned NOT NULL,
@@ -242,7 +242,7 @@ create table film_payment (
     constraint fk_film_rental_id FOREIGN KEY (film_rental_id) REFERENCES film_rental(film_rental_id) on delete CASCADE on update cascade
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-
+drop table if exists episode_payment;
 create table episode_payment(
     episode_payment_id smallint unsigned NOT NULL,
     customer_id smallint unsigned NOT NULL,

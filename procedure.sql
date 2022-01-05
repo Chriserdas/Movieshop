@@ -1,10 +1,7 @@
 --STORE 3.1
-
-DELIMITER $
-CREATE PROCEDURE most_rent(IN choice CHAR(1), IN number INT, IN imerominia1 DATE, IN imerominia2 DATE)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `most_rent`(IN lt CHAR(1), IN number INT, IN imerominia1 DATE, IN imerominia2 DATE)
 BEGIN
-
-IF(choice like 'm') THEN 
+IF(lt like 'm') THEN 
 
 SELECT film.title, film.film_id 
 FROM film INNER JOIN film_inventory ON film_inventory.film_id = film.film_id
@@ -13,8 +10,7 @@ WHERE film_rental.film_rental_date BETWEEN imerominia1 AND imerominia2
 GROUP BY film_id
 ORDER BY count(*) DESC 
 LIMIT number;
-
-ELSE IF(choice like 's') THEN 
+ELSEIF(lt like 's') THEN 
 SELECT serie.title, serie.serie_id, count(*) 
 FROM serie INNER JOIN seasons ON serie.serie_id = season.serie_id
 INNER JOIN episodes ON episodes.season_id = season.season_id
@@ -24,70 +20,63 @@ WHERE episode_rental.episode_rental_date BETWEEN imerominia1 AND imerominia2
 GROUP BY serie.serie_id
 ORDER BY count(*) DESC 
 LIMIT number;
-
-ELSE 
+ELSE
 SELECT 'wrong input choice';
-
 END IF;
-END$
+END
 
-DELIMITER;
 
 --STORE 3.2
-
-CREATE Procedure get_rental_of_customer(IN email_c VARCHAR(50), IN imerominia DATE)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_rental_of_customer`(IN email_c VARCHAR(50), IN imerominia DATE)
 BEGIN
+
 DECLARE id SMALLINT;
 DECLARE film_rental_of_day INT;
 DECLARE serie_rental_of_day INT;
-
-SELECT choice FROM customer where email like email_c;
-SELECT customer_id INTO id FROM customer where email like email_c;
-
-IF(choice like 'F') then
+DECLARE c VARCHAR(10);
+SELECT choice INTO c FROM customer where email LIKE email_c;
+SELECT customer_id INTO id FROM customer WHERE email LIKE email_c;
+IF(c like 'F') then
 SELECT count(*) AS film_rental_day FROM film_rental
-WHERE film_rental_date BETWEEN CONCAT(imerominia, "00:00:00") AND CONCAT(imerominia, "23:59:59") AND customer_id = id;
-
-ELSEIF(choice like 'S') then
+WHERE film_rental_date LIKE 'imerominia%' AND customer_id = id;
+ELSEIF(c like 'S') then
 SELECT count(*) AS serie_rental_day FROM episode_rental 
-WHERE episode_rental_date BETWEEN CONCAT(imerominia, "00:00:00") AND CONCAT(imerominia, "23:59:59") AND customer_id = id;
-
-ELSEIF(choice like 'FS') then 
+WHERE episode_rental_date LIKE 'imerominia%' AND customer_id = id;
+ELSEIF(c like 'FS') then 
 SELECT count(*) INTO film_rental_of_day FROM film_rental
-WHERE film_rental_date BETWEEN CONCAT(imerominia, "00:00:00") AND CONCAT(imerominia, "23:59:59") AND customer_id = id;
-
+WHERE film_rental_date LIKE 'imerominia%' AND customer_id = id;
 SELECT count(*) INTO serie_rental_of_day FROM episode_rental
-WHERE episode_rental_date BETWEEN CONCAT(imerominia, "00:00:00") AND CONCAT(imerominia, "23:59:59") AND customer_id = id;
-
+WHERE episode_rental_date LIKE 'imerominia%' AND customer_id = id;
 SELECT film_rental_of_day+serie_rental_of_day AS FilmSerie_rental_day;
-
-ELSE SELECT 'error, email doesnt exist';
-
+ELSE 
+SELECT 'error, email doesnt exist' AS message;
 END IF;
+END
 
 --Store 3.3
-CREATE PROCEDURE income()
+CREATE DEFINER=`root`@`localhost` PROCEDURE `income`()
 BEGIN
-DECLARE counter INT;
+DECLARE i INT;
 DECLARE income1 FLOAT;
 DECLARE income2 FLOAT;
-SET counter = 1; --January
+SET i = 1; 
 
-WHILE (counter <= 12) DO --until December for each month
+REPEAT
 
-SELECT sum(film_amount) INTO income1 FROM film_payment WHERE MONTH(film_payment_date) = counter;
-SELECT sum(episode_amount) INTO income2 FROM episode_payment WHERE MONTH(episode_payment_date) = counter;
+SELECT COALESCE(sum(film_amount),0) INTO income1 FROM film_payment WHERE MONTH(film_payment_date) = i;
+SELECT COALESCE(sum(episode_amount),0) INTO income2 FROM episode_payment WHERE MONTH(episode_payment_date) = i;
 
-SELECT income1 + income2 AS esoda_toy_mhna;
+SELECT i AS Month ,income1 AS income_from_film,income2 AS income_from_serie;
 
-SET counter = counter+1;
-END WHILE;
+SET i = i+1;
+UNTIL(i<=12)
+END REPEAT;
 END
 
 
 --STORE 3.4A
 
-CREATE PROCEDURE get_actors(IN name1 VARCHAR(20), IN name2 VARCHAR(20) )
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_actors`(IN name1 VARCHAR(20), IN name2 VARCHAR(20))
 BEGIN
 select first_name, last_name FROM actor
 WHERE last_name BETWEEN name1 AND name2
@@ -96,17 +85,15 @@ SELECT found_rows();
 END
 
 --STORE 3.4B
-CREATE PROCEDURE get_actor1(IN name VARCHAR(20))
+CREATE DEFINER=`root`@`localhost` PROCEDURE `get_actor1`(IN eponumo VARCHAR(20))
 BEGIN
-
 DECLARE plithos_same_actor INT;
 SELECT first_name,last_name FROM actor
-WHERE last_name LIKE name;
+WHERE last_name LIKE eponumo;
 SELECT found_rows() INTO plithos_same_actor;
 IF(plithos_same_actor > 0) THEN
 SELECT plithos_same_actor;
-ELSE(plithos_same_actor = 0) THEN
+ELSEIF(plithos_same_actor = 0) THEN
 SELECT 'NO SAME ACTOR WITH THIS LAST NAME';
-
 END IF;
 END
