@@ -1,13 +1,21 @@
+@font-face {
+    font-family: netflixFont;
+    src: url('../fonts/BebasNeue-Regular.otf');
+}
+
+
 body {
     padding: 0%;
     margin: 0px; 
     -webkit-app-region: drag;
     -webkit-user-select: none;
-    background-color: #333333;
+    background-color: #000505;
 }
 
+
+/*------------title bar-----------------*/
 #title-bar{
-    background-color:#333333;
+    background-color:#000505;
     height:32px;
 
 }
@@ -65,4 +73,93 @@ body {
 
 #close-button :hover{
     background-color: crimson;
+}
+
+#logo{
+    position: absolute;
+    left:15px;
+    top: 10px;
+    font-family: netflixFont;
+    font-size:30px;
+    font-weight:bolder;
+    letter-spacing:2px;
+    color:#E50914;
+}
+
+/*------------login-------------------*/
+
+.sign-in{
+    position:relative;
+    top:250px;
+    left:40%;
+    width:400px;
+    height:480px;
+    background-color:#161818;
+}
+
+
+
+.login{
+    position: absolute;
+    top:10px; 
+    width:100%;
+}
+
+#user-img {
+    position: relative;
+    width: 95px;
+    height: 95px;
+    left: 150px;
+}
+
+#login{
+    position: relative;
+    font-family: 'Oswald', sans-serif;
+    color: #E5E7E6;
+    font-size: 25px;
+    font-weight: bolder;
+    text-align: center;
+}
+
+.user-box{
+    position: relative;
+}
+
+
+.user-box input {
+    font-family: 'Oswald', sans-serif;
+    position:relative;
+    top:50px;
+    left:120px;
+    margin-bottom:40px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    border-bottom: 1.2px solid white;
+    outline: none;
+    background: transparent;
+}
+
+
+
+
+.user-box label {
+    position: absolute;
+    left: 120px;
+    top:50px;
+    font-size: 16px;
+    color: #E5E7E6;
+    pointer-events: none;
+    transition: .5s;
+}
+
+
+.user-box input:focus ~ label,
+.user-box input:valid ~ label {
+    /*font-family: 'Oswald', sans-serif;*/
+    top: 35px;
+    color: #E5E7E6;
+    font-size: 12px;
+    font-weight: bolder;
+    text-transform: uppercase;
 }
