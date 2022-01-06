@@ -75,25 +75,42 @@ body {
     background-color: crimson;
 }
 
-#logo{
+.logo{
     position: absolute;
     left:15px;
-    top: 10px;
+    top: 5px;
     font-family: netflixFont;
     font-size:30px;
     font-weight:bolder;
     letter-spacing:2px;
     color:#E50914;
 }
+#movie{
+    position:relative;
+    top:0px;
+}
+#s{
+    position:relative;
+    font-size:45px;
+    transform:rotate(-10deg);
+    left:60px;
+    top:-50px;
+}
+#hop{
+    position:relative;
+    top:-92px;
+    left:80px;
+    font-size:30px;
+}
 
 /*------------login-------------------*/
 
 .sign-in{
-    position:relative;
-    top:250px;
+    position:absolute;
+    top:20%;
     left:40%;
     width:400px;
-    height:480px;
+    height:530px;
     background-color:#161818;
 }
 
@@ -145,6 +162,7 @@ body {
 
 .user-box label {
     position: absolute;
+    font-family: 'Oswald', sans-serif;
     left: 120px;
     top:50px;
     font-size: 16px;
@@ -156,10 +174,71 @@ body {
 
 .user-box input:focus ~ label,
 .user-box input:valid ~ label {
-    /*font-family: 'Oswald', sans-serif;*/
+    font-family: 'Oswald', sans-serif;
     top: 35px;
     color: #E5E7E6;
     font-size: 12px;
     font-weight: bolder;
     text-transform: uppercase;
+    color: #E50914;
+}
+
+.sign-in-button{
+    position: relative;
+    left: 38%;
+    padding: 15px;
+    top: 90px;
+    font-family: 'Oswald', sans-serif;
+    border-radius: 38px;
+    font-size: 20px;
+    font-weight: bolder;
+    border: 3px solid #E50914;
+    outline: none;
+    background-color: transparent;
+    color: #E50914;
+    transition: .5s;
+}
+
+.sign-in-button:hover{
+    background-color: #E50914;
+    color:black;
+    cursor:pointer;
+}
+
+#admin-btn{
+    position: relative;
+    top:20px;
+    left:-70px;
+    font-family: 'Oswald', sans-serif;
+    color:#E5E7E6;
+    outline:none;
+    border:none;
+    background-color:transparent;
+    text-decoration:underline;
+    transition: .2s;
+}
+
+#employee-btn{
+    position: relative;
+    font-family: 'Oswald', sans-serif;
+    top:20px;
+    left:30px;
+    color:#E5E7E6;
+    outline:none;
+    border:none;
+    background-color:transparent;
+    text-decoration:underline;
+    transition: .2s;
+}
+
+#admin-btn:hover{
+    cursor:pointer;
+    text-decoration:none;
+    color:#E50914;
+}
+
+#employee-btn:hover{
+    cursor:pointer;
+    text-decoration:none;
+    color:#E50914;
 }

@@ -6,8 +6,6 @@ const path = require('path');
 
 
 
-
-
 app.on('ready',()=>{
     const primaryDisplay = screen.getPrimaryDisplay();
     const {width,height} = primaryDisplay.workAreaSize;
@@ -25,23 +23,8 @@ app.on('ready',()=>{
         
     });
     
-    /*var loginWindow = new BrowserWindow({
-        webPreferences:{ 
-            enableRemoteModule: true,
-            webSecurity:false,
-            nodeIntegration: true,
-            contextIsolation: false
-        },
-        parent: win,
-        width:400,
-        height:420,
-        frame:false,
-        resizable:false,
-        
-    });*/
-    
     win.loadFile('../html/index.html');
-    //loginWindow.loadFile('../html/login.html');
+    
 
 
     ipcMain.on('close_app',(_event,arg)=>{
