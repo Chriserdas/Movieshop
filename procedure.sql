@@ -29,25 +29,33 @@ END
 --STORE 3.2
 CREATE DEFINER=`root`@`localhost` PROCEDURE `get_rental_of_customer`(IN email_c VARCHAR(50), IN imerominia DATE)
 BEGIN
-
 DECLARE id SMALLINT;
 DECLARE film_rental_of_day INT;
 DECLARE serie_rental_of_day INT;
+DECLARE film_rental_day INT;
+DECLARE episode_rental_day INT;
 DECLARE c VARCHAR(10);
 SELECT choice INTO c FROM customer where email LIKE email_c;
 SELECT customer_id INTO id FROM customer WHERE email LIKE email_c;
-IF(c like 'F') then
-SELECT count(*) AS film_rental_day FROM film_rental
-WHERE film_rental_date LIKE 'imerominia%' AND customer_id = id;
+IF(c LIKE 'F') then
+SELECT customer.customer_id, count(*) AS film_rental_day FROM customer 
+INNER JOIN film_rental ON customer.customer_id = film_rental.customer_id
+WHERE film_rental_date between  CONCAT(imerominia," 00:00:00") and CONCAT(imerominia," 23:59:59") AND customer.customer_id = id;
+
 ELSEIF(c like 'S') then
-SELECT count(*) AS serie_rental_day FROM episode_rental 
-WHERE episode_rental_date LIKE 'imerominia%' AND customer_id = id;
+SELECT customer.customer_id,count(*) AS episode_rental_day FROM customer
+INNER JOIN episode_rental ON customer.customer_id = episode_rental.customer_id
+WHERE episode_rental_date between  CONCAT(imerominia," 00:00:00") and CONCAT(imerominia," 23:59:59") AND customer.customer_id = id;
+
 ELSEIF(c like 'FS') then 
-SELECT count(*) INTO film_rental_of_day FROM film_rental
-WHERE film_rental_date LIKE 'imerominia%' AND customer_id = id;
-SELECT count(*) INTO serie_rental_of_day FROM episode_rental
-WHERE episode_rental_date LIKE 'imerominia%' AND customer_id = id;
-SELECT film_rental_of_day+serie_rental_of_day AS FilmSerie_rental_day;
+SELECT count(*) INTO film_rental_of_day FROM customer
+INNER JOIN film_rental ON customer.customer_id = film_rental.customer_id
+WHERE film_rental_date between  CONCAT(imerominia," 00:00:00") and CONCAT(imerominia," 23:59:59") AND customer.customer_id = id;
+SELECT count(*) INTO serie_rental_of_day FROM customer
+INNER JOIN episode_rental ON customer.customer_id = episode_rental.customer_id
+WHERE episode_rental_date between  CONCAT(imerominia," 00:00:00") and CONCAT(imerominia," 23:59:59") AND customer.customer_id = id;
+SELECT 'customer has rent: ', film_rental_of_day+serie_rental_of_day AS FilmSerie_rental_day;
+
 ELSE 
 SELECT 'error, email doesnt exist' AS message;
 END IF;
@@ -56,21 +64,52 @@ END
 --Store 3.3
 CREATE DEFINER=`root`@`localhost` PROCEDURE `income`()
 BEGIN
-DECLARE i INT;
-DECLARE income1 FLOAT;
-DECLARE income2 FLOAT;
-SET i = 1; 
+SELECT t1.m month,
+       COALESCE(t1.incomeFilm, 0) incomeFilm,
+       COALESCE(t2.incomeSerie, 0) incomeSerie
+FROM
+(
+    SELECT 
+           MONTH(film_payment_date) m, 
+           COALESCE(sum(film_amount),0) incomeFilm
+    FROM film_payment
+    GROUP BY MONTH(film_payment_date) 
+    ORDER BY MONTH(film_payment_date) ASC
+) t1
+LEFT JOIN
+(
+    SELECT 
+           MONTH(episode_payment_date) m, 
+           COALESCE(sum(episode_amount),0) incomeSerie
+    FROM episode_payment
+    GROUP BY MONTH(episode_payment_date) 
+    ORDER BY MONTH(episode_payment_date) ASC
+) t2 ON t1.m = t2.m
 
-REPEAT
+   UNION 
 
-SELECT COALESCE(sum(film_amount),0) INTO income1 FROM film_payment WHERE MONTH(film_payment_date) = i;
-SELECT COALESCE(sum(episode_amount),0) INTO income2 FROM episode_payment WHERE MONTH(episode_payment_date) = i;
+SELECT t2.m month,
+       COALESCE(t1.incomeFilm, 0) incomeFilm,
+       COALESCE(t2.incomeSerie, 0) incomeSerie
+FROM
+(
+    SELECT  
+           MONTH(film_payment_date) m, 
+           COALESCE(sum(film_amount),0) incomeFilm
+    FROM film_payment
+    GROUP BY MONTH(film_payment_date) 
+    ORDER BY MONTH(film_payment_date) ASC
+) t1
+RIGHT JOIN
 
-SELECT i AS Month ,income1 AS income_from_film,income2 AS income_from_serie;
-
-SET i = i+1;
-UNTIL(i<=12)
-END REPEAT;
+(
+    SELECT  
+           MONTH(episode_payment_date) m, 
+           COALESCE(sum(episode_amount),0) incomeSerie
+    FROM episode_payment
+    GROUP BY MONTH(episode_payment_date) 
+    ORDER BY MONTH(episode_payment_date) ASC
+) t2 ON  t1.m = t2.m;
 END
 
 
