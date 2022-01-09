@@ -18,6 +18,8 @@ app.on('ready',()=>{
             contextIsolation: false
         },
         width,height,
+        minWidth:1430,
+        minHeight:390,
         frame: false,
         titleBarStyle: 'customButtonsOnHover',
         

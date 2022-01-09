@@ -36,41 +36,83 @@
             
     </div>
 
-    <div class="sign-in">
-       
-        <div class="login">
-            <img src ="../icons/login.png" id = "user-img" draggable="false">
+    <div class="sign-in_container">
+        <div class="sign-in">
+        
+            <div class="login">
+                <img src ="../icons/login.png" id = "user-img" draggable="false">
 
-            <div id="login">Customer Sign in</div>
+                <div id="login">Customer Sign in</div>
 
-            <form>
-                    
-                <div class="user-box">
-    
-                    <input type="text" name="" required ="" maxlength="20" id="firstname" draggable="false"> 
-                    <label>First name</label>
-    
+                <form>
+                        
                     <div class="user-box">
-                        <input type="password" name="" required="" id="lastname" maxlength="20">
-                        <label>Last name</label>
+        
+                        <input type="text" name="" required ="" maxlength="45" id="firstname" draggable="false"> 
+                        <label>First name</label>
+        
+                        <div class="user-box">
+                            <input type="password" name="" required="" id="lastname" maxlength="45">
+                            <label>Last name</label>
+                        </div>
+        
+
+                        <div class="user-box">
+                            <input type="text" name="" required="" id="email" maxlength="50">
+                            <label>Email</label>
+                        </div>
+                        
+                        <button class = "sign-in-button">SIGN IN</button>
+
+                        <button id = "admin-btn">Are you an admin?</button> 
+                        <button id = "employee-btn">Are you an employee?</button>
                     </div>
-    
+                </form>
 
-                    <div class="user-box">
-                        <input type="text" name="" required="" id="email" maxlength="20">
-                        <label>Email</label>
-                    </div>
-                    
-                    <button class = "sign-in-button">SIGN IN</button>
-
-                    <button id = "admin-btn">Are you an admin?</button> 
-                    <button id = "employee-btn">Are you an employee?</button>
-                </div>
-            </form>
-
+            </div>
         </div>
     </div>
-</body>
+    <div class="customer">
+        <div class="left-bar">
+            <button id="films">
+                <img src="../icons/film.png" draggable="false" id="film-img">
+            </button>
 
+            <button id="series">
+               <img src="../icons/series.png" draggable="false" id="series-img">
+            </button>
+
+            <button id="owned">
+                <img src="../icons/owned.png" draggable="false" id="owned-img">
+            </button>
+
+            <button id="account">
+                <img src="../icons/account.png" draggable="false" id="account-img">
+            </button>
+        </div>
+
+        <div class="search">
+            <div id="search-container">
+                <img src="../icons/search.png" id="search-img" draggable="false">
+                <textarea name="search" id="search-area" maxlength="65" placeholder="Search movies,actors,etc"></textarea>
+            </div>
+        </div>
+
+        <div class="category">
+            <div id="type-name">Movies</div>
+            <div id="genres">GENRES</div>
+
+            <div class="categories">
+
+            </div>
+        </div>
+
+        <div class="content">
+            
+        </div>
+
+    </div>
+</body>
+<script src="http://localhost:5000/socket.io/socket.io.js"></script>
 <script src="../js/index.js"></script>
 </html>

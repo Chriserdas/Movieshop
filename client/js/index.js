@@ -1,6 +1,6 @@
 const {ipcRenderer} = require('electron');
 
-
+var socket;
 //------------------titlebar buttons-----------------
 
 const close = document.getElementById('close-button');
@@ -13,9 +13,11 @@ const firstname = document.querySelector("#firstname");
 const lastname = document.querySelector("#lastname");
 const email = document.querySelector("#email");
 const signin = document.querySelector(".sign-in-button");
+const signInContainer = document.querySelector(".sign-in_container");
 
 const admin_button = document.querySelector("#admin-btn");
 const employee_button = document.querySelector("#employee-btn");
+
 
 let user = document.querySelector("#login");
 
@@ -65,3 +67,12 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+
+signin.addEventListener('click',()=>{
+    signInContainer.style.opacity = '0';
+    setTimeout(()=>{
+        signInContainer.style.display = 'none';
+    },1000);
+
+    socket = io.connect('http://localhost:5000/');
+});
