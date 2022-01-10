@@ -1,6 +1,5 @@
 let config = {
     host:"localhost",
-    user:"root",
     database:"tvondemand",
 };
 
