@@ -136,3 +136,27 @@ ELSEIF(plithos_same_actor = 0) THEN
 SELECT 'NO SAME ACTOR WITH THIS LAST NAME';
 END IF;
 END
+
+
+DROP PROCEDURE IF EXISTS set_amount;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `set_amount`(IN id SMALLINT, IN val VARCHAR(10) , OUT amount FLOAT)
+BEGIN
+DECLARE idc SMALLINT;
+DECLARE c VARCHAR(10);
+DECLARE v ENUM('F','S');
+SELECT choice INTO c FROM customer WHERE customer_id=id;
+
+IF(c LIKE 'F' AND v='F') then 
+SET amount = 0.4;
+
+ELSEIF(c LIKE 'S' AND v= 'S') then
+SET amount = 0.3;
+
+ELSEIF(c like 'FS' AND v='F') then
+SET amount = 0.3;
+ELSEIF(c like 'FS' AND v='S') then
+SET amount=0.1;
+
+END IF;
+
+END

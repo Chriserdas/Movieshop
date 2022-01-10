@@ -999,7 +999,7 @@ INSERT INTO actor VALUES (1,'PENELOPE','GUINESS'),
 (997,'Nora','Russell'),
 (998,'George','Compton'),
 (999,'Adeline','Lee'),
-(1000,'Kaliyah','Bailey')
+(1000,'Kaliyah','Bailey');
 
 
 ------------ACTOR/FILM INFOS-------------
@@ -1461,7 +1461,8 @@ INSERT INTO `film_inventory` (`film_inventory_id`, `film_id`) VALUES
 (3244, 770),
 (152, 732),
 (361, 67),
-(3657, 398);
+(3657, 398),
+(400,200);
 
 INSERT INTO `episode_inventory` (`episode_inventory_id`, `episode_id`) VALUES
 (2345, 11),
@@ -1581,7 +1582,8 @@ INSERT INTO `film_rental` (`film_rental_id`, `film_rental_date`, `film_inventory
 (12123, '2005-08-17 23:22:18', 361, 497),
 (12698, '2006-02-14 15:16:03', 3657, 497),
 (15919, '2005-08-23 18:01:31', 1746, 497),
-(16200, '2005-05-26 00:25:23', 152, 142);
+(16200, '2005-05-26 00:25:23', 152, 142),
+(16300,'2005-05-26 18:01:30', 400, 142);
 
 INSERT INTO `episode_rental` (`episode_rental_id`, `episode_rental_date`, `episode_inventory_id`,  `customer_id`) VALUES
 (10, '2003-02-13 15:29:35', 460, 16),
