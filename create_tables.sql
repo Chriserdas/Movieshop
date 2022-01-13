@@ -232,11 +232,12 @@ create table episode_rental(
 ------------------PAYMENT--------------
 
 drop table if exists film_payment;
+
 create table film_payment (
-    film_payment_id smallint not null,
+    film_payment_id smallint not null default 0,
     customer_id smallint unsigned NOT NULL,
     film_rental_id smallint not null,
-    film_amount decimal(5,2) not null,
+    film_amount decimal(5,2) not null default 0,
     film_payment_date DATETIME,
     PRIMARY KEY  (film_payment_id),
     constraint fk_customer_fp_id FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE on update cascade,
@@ -245,7 +246,7 @@ create table film_payment (
 
 drop table if exists episode_payment;
 create table episode_payment(
-    episode_payment_id smallint unsigned NOT NULL,
+    episode_payment_id smallint unsigned DEFAULT 0,
     customer_id smallint unsigned NOT NULL,
     episode_rental_id smallint unsigned NOT NULL,
     episode_amount decimal(5,2) NOT NULL,

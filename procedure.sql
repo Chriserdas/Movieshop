@@ -139,24 +139,25 @@ END
 
 
 DROP PROCEDURE IF EXISTS set_amount;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `set_amount`(IN id SMALLINT, IN val VARCHAR(10) , OUT amount FLOAT)
+delimiter$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `set_amount`(IN idc INT,IN val ENUM('F','S'), OUT price DECIMAL(5,2))
 BEGIN
-DECLARE idc SMALLINT;
 DECLARE c VARCHAR(10);
-DECLARE v ENUM('F','S');
-SELECT choice INTO c FROM customer WHERE customer_id=id;
+SELECT choice INTO c FROM customer WHERE customer_id=idc;
 
-IF(c LIKE 'F' AND v='F') then 
-SET amount = 0.4;
 
-ELSEIF(c LIKE 'S' AND v= 'S') then
-SET amount = 0.3;
+IF(c LIKE 'F' AND val LIKE 'F' ) then 
+/*SELECT film_amount INTO price FROM film_payment WHERE film_payment.customer_id=idc;*/
+SET price = 0.40;
 
-ELSEIF(c like 'FS' AND v='F') then
-SET amount = 0.3;
-ELSEIF(c like 'FS' AND v='S') then
-SET amount=0.1;
+ELSEIF(c LIKE 'S' AND val= 'S') then
+
+SET price = 0.30;
+
+ELSEIF(c like 'FS' AND val='F') then
+SET price = 0.30;
+ELSEIF(c like 'FS' AND val='S') then
+SET price=0.10;
 
 END IF;
-
-END
+END$
