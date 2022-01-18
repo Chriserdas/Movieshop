@@ -239,7 +239,17 @@ create table episode_payment(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
-
+-----------------LOG------------------------------
+drop table if exists log;
+create table log(
+    username SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    table_name VARCHAR(20) NOT NULL,
+    action VARCHAR(30),
+    action_date DATETIME,
+    success ENUM('yes', 'no'),
+    PRIMARY KEY(username),
+    CONSTRAINT log_user FOREIGN KEY (username) REFERENCES customer(customer_id) ON DELETE CASCADE ON UPDATE CASCADE
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
 
