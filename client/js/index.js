@@ -89,6 +89,26 @@ function capitalizeFirstLetter(string) {
 }
 
 
+series.addEventListener('click',()=>{
+
+    series.style.backgroundColor = "#4d30d5";
+    divClicked.style.backgroundColor = "";
+    divClicked = series;
+    document.querySelector('.content').innerHTML = "";
+    document.querySelector('.movieInfo').style.animation = "hideMovieInfo .6s forwards "
+
+    if(customer_choice == 'FS'  || customer_choice == 'S'){
+        socket.emit('getSeries','');
+
+        socket.on('takeSeries',series=>{
+            createMovie(series);
+        });
+    }
+    else notRegistered();
+});
+
+
+
 signin.addEventListener('click',(e)=>{
     
     
@@ -215,10 +235,19 @@ function createCategories(socket){
 
 function createMovie(movies){
 
+    let movies_count = document.createElement("div");
+    
+    movies_count.appendChild(document.createTextNode(movies.length + " movies"));
+    movies_count.className = "movie-count";
+    document.querySelector('.content').appendChild(movies_count);
+    
+
     for(let movie of movies){
         let movieDiv = document.querySelector('.movieInfo');
         let button = document.createElement("button");
         let img = document.createElement("img");
+        
+
         img.setAttribute("src", "../icons/film-image.jpg");
         img.setAttribute("width", "200px");
         img.setAttribute('height', "250px");
@@ -231,6 +260,7 @@ function createMovie(movies){
         let titleDiv = document.createElement("div");
         let yearDiv = document.createElement("div");
 
+        
         imgDiv.className = "imgDiv";
         titleDiv.className = "title";
         yearDiv.className = "year";
@@ -245,6 +275,7 @@ function createMovie(movies){
         button.appendChild(imgDiv);
         
         document.querySelector('.content').appendChild(button);
+        
 
         button.addEventListener('click',()=>{
             
@@ -261,6 +292,8 @@ function createMovie(movies){
                 else{
                     createOwnedButton();
                 }
+
+                
             });
 
         });
@@ -290,6 +323,10 @@ function createRentButton(socket,movie) {
     button.addEventListener('click',()=>{
         socket.emit('rentFilm',id + "," +  movie.film_id + "," + customer_choice);
         
+    });
+
+    socket.on('rent_done',data=>{
+        document.querySelector('.movieInfo').style.animation = "hideMovieInfo 1.6s forwards "
     });
 }
 

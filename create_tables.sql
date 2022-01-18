@@ -193,8 +193,7 @@ create table film_rental (
     film_id smallint unsigned NOT NULL,
     customer_id smallint unsigned NOT NULL,
     primary key (film_rental_id),
-    constraint fk_customer_id FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE on update cascade,
-    constraint fk_film_inventory foreign key (film_id) REFERENCES film(film_id) ON DELETE CASCADE ON UPDATE cascade
+    constraint fk_customer_id FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE on update cascade
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -205,8 +204,7 @@ create table episode_rental(
     episode_id SMALLINT UNSIGNED NOT NULL, 
     customer_id SMALLINT UNSIGNED NOT NULL,
     primary key (episode_rental_id),
-    constraint fk_customer_ep_id FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE on update cascade,
-    CONSTRAINT fk_inventory foreign key (episode_id) references episodes(episode_id) on delete cascade on update cascade
+    constraint fk_customer_ep_id FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE on update cascade
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -215,10 +213,10 @@ create table episode_rental(
 drop table if exists film_payment;
 
 create table film_payment (
-    film_payment_id smallint not null default 0,
+    film_payment_id smallint not null auto_increment,
     customer_id smallint unsigned NOT NULL,
     film_rental_id smallint not null,
-    film_amount decimal(5,2) not null default 0,
+    film_amount decimal(5,2) not null,
     film_payment_date DATETIME,
     PRIMARY KEY  (film_payment_id),
     constraint fk_customer_fp_id FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE on update cascade,
@@ -227,7 +225,7 @@ create table film_payment (
 
 drop table if exists episode_payment;
 create table episode_payment(
-    episode_payment_id smallint unsigned DEFAULT 0,
+    episode_payment_id smallint unsigned auto_increment ,
     customer_id smallint unsigned NOT NULL,
     episode_rental_id smallint unsigned NOT NULL,
     episode_amount decimal(5,2) NOT NULL,

@@ -918,3 +918,14 @@ body {
     border:3px #76B041 solid;
     color:#76B041;
 }
+
+.movie-count{
+    position:absolute;
+    font-family:Oswald;
+    font-size:25px;
+    left:100px;
+    top:70px;
+    text-transform:uppercase;
+    color:#F2E86D;
+    animation: showContent 0.5s 6100ms forwards;
+}

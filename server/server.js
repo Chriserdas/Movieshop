@@ -64,6 +64,8 @@ io.on('connection', socket =>{
 
     });
 
+    //-------------------FILMS-----------------------
+
     socket.on('getFilmBuyStatus',customerData=>{
         let customerInfo = dataParser(customerData,",");
 
@@ -76,14 +78,28 @@ io.on('connection', socket =>{
 
     socket.on('rentFilm', data=>{
         data = dataParser(data,",");
+        let amount = 0.4;
 
-        console.log(data);
-        if(data[3] == 'FS'){
-
+        if(data[2] == 'FS'){
+            amount = 0.3;
         }
+
+        insertRental('film_rental','film_rental_date',data[1],data[0]).then(()=>{
+            insertFilmPayment(data[0],data[1],amount);
+            socket.emit('rent_done','');
+        });
+        
     });
 
-    //-------------------------------------------------
+    //------------------SERIES----------------------------
+
+    socket.on('getSeries',data=>{
+        getSeries().then(result=>{
+            socket.emit('takeSeries',result)
+        });
+    });
+
+
 });
 
 
@@ -142,9 +158,8 @@ function getFilms(tableName){
 function checkFilm(values) {
 
     let query = 
-    "select film_rental.customer_id, film_inventory.film_id  from film_rental" +
-    " inner join film_inventory on film_inventory.film_inventory_id = film_rental.film_inventory_id" +
-    " where film_rental.customer_id = ? and film_inventory.film_id = ?"
+    "select film_rental.customer_id, film_rental.film_id  from film_rental" +
+    " where film_rental.customer_id = ? and film_rental.film_id = ?"
     return new Promise((resolve, reject) =>{
 
         connection.query(query, [values[0],values[1]], (err, results) =>{
@@ -161,6 +176,61 @@ function checkFilm(values) {
     });
 }
 
-function insertFilmPayment(){
+function insertRental(tableName,date_var,value1,value2){
 
+    let query = "INSERT INTO " + tableName + " ( "+ date_var +", film_id,customer_id)"+
+    " VALUES(now(),?,?)"
+    return new Promise((resolve, reject) =>{
+
+        connection.query(query,[value1,value2],(err, results)=>{
+            if(err) throw err;
+
+            else{
+                resolve();
+            }
+        });
+    });
 }
+
+function insertFilmPayment(value1,film_id,amount){
+
+    let query = "INSERT INTO film_payment(customer_id,film_rental_id,film_payment_date,film_amount)" +
+    " VALUES (?, (Select film_rental_id from film_rental where customer_id = ? and film_id = ?), now(),?)";
+        return new Promise((resolve, reject) =>{
+
+        connection.query(query,[value1,value1,film_id,amount],(err, results)=>{
+            if(err) throw err;
+
+            else{
+                resolve();
+            }
+        });
+    });
+}
+
+
+function getSeries(){
+
+    let query = "SELECT series.serie_id,title,description,release_year," +
+    "language.name as language_name,rating,category.name as category " +
+    "FROM series "+
+    "inner join language on series.language_id = language.language_id " +
+    "inner join serie_category on serie_category.serie_id = series.serie_id " +
+    "inner join category on category.category_id = serie_category.category_id " +
+    "order by title asc;"
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,(err, results)=>{
+
+            if(err) throw err;
+
+            else{
+                resolve(JSON.parse(JSON.stringify(results)));
+            }
+        })
+
+    });
+}
+
+
