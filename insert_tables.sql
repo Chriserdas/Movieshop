@@ -1321,15 +1321,15 @@ INSERT INTO `series` (`serie_id`,`title`, `description`, `release_year`, `langua
 ---------------SERIE INFO--------------
 
 INSERT INTO `seasons` (`season_id`, `serie_id`, `season_number`, `release_date`, `ending_date`) VALUES
-(10, 103, 6, '2007-06-05', '2017-07-20'),
-(20, 301, 3, '2009-07-02', '2013-06-17'),
-(30, 150, 4, '2012-03-14', '2017-08-03' ),
-(40, 50, 5, '2013-02-16', '2018-03-12'),
+(10, 103, 2, '2007-06-05', '2017-07-20'),
+(20, 301, 2, '2009-07-02', '2013-06-17'),
+(30, 150, 2, '2012-03-14', '2017-08-03' ),
+(40, 50, 2, '2013-02-16', '2018-03-12'),
 (50, 100, 2, '2016-09-12', '2018-03-23'),
-(60, 20, 4, '2010-01-19', '2014-07-26'),
-(70, 23, 3, '2016-04-20', '2019-09-10'),
+(60, 20, 2, '2010-01-19', '2014-07-26'),
+(70, 23, 2, '2016-04-20', '2019-09-10'),
 (80, 45, 2, '2019-02-19', '2021-05-24'),
-(90, 15, 5, '2007-07-15', '2016-03-19');
+(90, 15, 2, '2007-07-15', '2016-03-19');
 
 
 INSERT INTO `episodes` (`episode_id`, `season_id`, `episode_number`, `title`, `description`, `length`) VALUES
@@ -1340,11 +1340,17 @@ INSERT INTO `episodes` (`episode_id`, `season_id`, `episode_number`, `title`, `d
 (15, 30, 15, 'Raising Hell', 'Dean, Castiel and Sam call on Rowena to help keep the evil souls at bay and get an unexpected assist by Ketch.', 40),
 (16, 30, 14, 'Fan Fiction', 'Sam and Dean investigate a haunting at a theatre.', 35),
 (17,40, 5, 'Fire Walks with Z,', 'Tensions run high as Zoya reluctantly celebrates her birthday. Audrey levels with Aki. Kate gets an exciting opportunity.', 43),
-(18, 50, 6, 'Where You Left Your Heart', 'Where You Left Your Heart', 40),
+(18, 50, 6, 'Where You Left Your Heart', 'Desperate to see her father Klaus after seven years, Hope resorts to drastic measures to bring him back to New Orleans.', 40),
 (19, 60, 3, 'Sara', 'Team Arrow is in pursuit of a new villain who poses a threat to Starling City. Meanwhile, Oliver is worried about not having heard from Thea.', 39),
 (20, 70, 19, 'From the Ashes', 'Clarke and her friends attempt to rebuild Sanctum as a new threat rises in the woods.', 41),
 (21, 80, 2, 'Nothing Ever Changes Around Here', 'Before Lucifer starts his new job, he and Chloe experience a magical night with a murderous end. Linda and Amenadiel host Maze and Eve for dinner.', 35),
-(22, 90, 8, 'The Wrath of the Time Bees', 'Alice didnt buy enough tacos. Fens got 3 bars.', 43);
+(22, 90, 8, 'The Wrath of the Time Bees', 'Alice didnt buy enough tacos. Fens got 3 bars.', 43),
+(23, 90, 4, 'Do Something Crazy', 'Penny and Julia go stargazing; Eliot and Margo forget a sandwich.', 45),
+(24, 80, 3, 'Everythings Coming Up Lucifer', 'Lucifer and Chloe look into the murder of a stand-in actress; Chloes faith in Lucifer is tested.', 42),
+(25,40, 6, 'Gone Maybe Gone', 'Serena has gone missing; Chuck and Blair make a promise to each other about their relationship.', 43),
+(26, 50, 7, 'When the Saints Go Marching In', 'Intent on saving Hopes life, Klaus plan will change the lives of the Mikaelson family forever.', 41),
+(27, 60, 4, 'Welcome to Hong Kong', 'Oliver, John, Laurel, and Tatsu seek out an important person within The Monitors plan. Connor has a heart to heart with his brother.', 42),
+(28, 70, 2, 'The Garden', 'Echo and Gabriel learn more about Hope and her mysterious past.', 42);
 
 
 
