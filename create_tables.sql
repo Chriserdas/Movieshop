@@ -37,7 +37,6 @@ CREATE TABLE seasons(
     release_date date,
     ending_date date,
     PRIMARY KEY(season_id),
-    unique (serie_id),
     constraint fk_serie_id foreign key (serie_id) REFERENCES series(serie_id) ON DELETE CASCADE on update cascade
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     
