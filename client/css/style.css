@@ -929,3 +929,139 @@ body {
     color:#F2E86D;
     animation: showContent 0.5s 6100ms forwards;
 }
+
+.seasonsDiv{
+    position:absolute;
+    top:10%;
+    left:50%;
+}
+
+.seasonButton{
+    margin-left:35px;
+    background-color:transparent;
+    color:white;
+    font-family:Oswald;
+    font-weight:light;
+    font-size:25px;
+    outline:none;
+    border:none;
+    padding-bottom:10px;
+    transition:.5s ease;
+}
+
+.seasonButton:hover{
+    letter-spacing:1.1px;
+    cursor:pointer;
+    border-bottom:1px white solid;
+}
+
+.season_after_series{
+    position:absolute;
+    top:0px;
+    font-family:Oswald;
+    font-size:25px;
+    color:#444444;
+    left:45%;
+}
+
+.episodes{
+    position:absolute;
+    top:50px;
+   display:inline-flex;
+   overflow-x:clip;
+   width:100%;
+   height:86%;
+}
+
+.episodeDiv{
+    position:relative;
+    width:50%;
+    
+    border-left:1px white solid;
+}
+
+.episodeNumber{
+    position:absolute;
+    top:30px;
+    left:30%;
+    font-size:19px;
+    color:#b3b3b3;
+}
+
+.titleEp{
+    position:relative;
+    top:80px;
+    font-size:35px;
+    left:20%;
+}
+
+.descriptionEp{
+    position:relative;
+    top:80px;
+    width:50%;
+    left:10%;
+    font-size:15px;
+    letter-spacing:1.1px;
+    
+}
+
+.eplength{
+    position:relative;
+    top:70%;
+    left:90%
+}
+
+.backButton{
+    position:absolute;
+    top:5px;
+    left:10px;
+    outline:none;
+    background-color:transparent;
+    color:white;
+    font-size:25px;
+    width:40px;
+    height:40px;
+    border-radius:100%;
+    border:2px white solid;
+}
+
+.backButton:hover{
+    cursor:pointer;
+    background-color:white;
+    color:#192231;
+    font-weight:bolder;
+}
+
+.ep_rentButton{
+    position:absolute;
+    background-color:transparent;
+    color:#F991CC;
+    font-family:Oswald;
+    font-size:25px;
+    padding:7px 25px;;
+    outline:none;
+    border:2px #F991CC solid;
+    border-right:none;
+    border-left:none;
+    letter-spacing:1.1px;
+    left:80%;
+    transition:600ms ease;
+    display:none;
+}
+
+.ep_rentButton:hover{
+    letter-spacing:3.1px;
+   animation:fill 600ms forwards ease-in;
+   cursor:pointer;
+}
+
+.ep_owneDiv{
+    position:absolute;
+    left:80%;
+    font-size:20px;
+    padding:7px 25px;
+    border:3px #76B041 solid;
+    color:#76B041;
+    display:none;
+}
+
