@@ -582,10 +582,11 @@ body {
     position:absolute;
     top:85.4px;
     left:130px;
-    width:260px;
+    width:calc(100vh - 40.5%);
     height:calc(100vh - 130.5px);
     background-color:#232c3b;
     box-shadow:0px 0px 6px black;
+    overflow-y:auto;
 }
 
 .content{
@@ -605,7 +606,8 @@ body {
 #type-name{
     position: relative;
     top:30px;
-    text-align:center;
+    display:flex;
+    justify-content:center;
     font-family: 'Oswald',sans-serif;
     color:white;
     font-size:35px;
@@ -749,7 +751,8 @@ body {
     background-color:#151C28;
     box-shadow: 0px 0px 5px black;
     width:calc(100vw - 407px);
-    height:calc(100vh - 677px);
+    /*height:calc(100vh - 677px);*/
+    height:calc(100vh - 65%);
     font-family:Oswald;
     color:white;
     /*animation:showMovieInfo .3s forwards;*/
