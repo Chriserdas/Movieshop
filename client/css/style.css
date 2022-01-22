@@ -969,7 +969,7 @@ body {
 
 .episodes{
     position:absolute;
-    top:50px;
+    top:14%;
    display:inline-flex;
    overflow-x:clip;
    width:100%;
@@ -979,7 +979,7 @@ body {
 .episodeDiv{
     position:relative;
     width:50%;
-    
+    height:100%;
     border-left:1px white solid;
 }
 
