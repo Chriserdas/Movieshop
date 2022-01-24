@@ -123,7 +123,81 @@
             
         </div>
 
+        <div class ="accountDiv">
+            <div id ="account_title">ACOUNT INFO</div>
+            <div class="firstname">
+                <div id ="firstname">First Name:</div>
+                <textarea  id="firstnameArea" maxlength="45"  ></textarea>
+            </div>
+            <div class="lastname">
+                <div id ="lastname">Last Name:</div>
+                <textarea  id="lastnameArea" maxlength="45"></textarea>
+            </div>
+            <div class="email">
+                <div id ="email">Email:</div>
+                <div  id="emailtxt"></div>
+            </div>
+            <div class="createDate">
+                <div id ="createDate">Date of creation:</div>
+                <div  id="datetxt"></div>
+            </div>
+
+            <div class="choice">
+                <div id="choice_title">Available content:</div>
+                <div id ="choice">
+                    <button id ="chosen"></button>
+                    <button id ="down-button" >></button>
+                </div>
+                
+                <div class="choice-content">
+                    <button id = "choice1"></button>
+                    <button id = "choice2"></button>
+                </div>
+            </div>
+
+            <div class="address">
+                <div id ="address">Address:</div>
+                <textarea  id="addressArea" maxlength="45"></textarea>
+            </div>
+
+            <div class="city">
+                <div id ="city">City:</div>
+                <div id ="city-choosed">
+                    <button id ="city_chosen"></button>
+                    <button id = "down-button">></button>
+                </div>
+                <div class="city-content">
+                
+                </div>
+            </div>
+
+            <div class="country">
+                <div id ="country_title">Country:</div>
+                <div  id="countryname"></div>
+            </div>
+
+            <div class="district">
+                <div id ="district">District:</div>
+                <textarea  id="districtArea" maxlength="45"></textarea>
+            </div>
+
+            <div class="postalcode">
+                <div id ="postalcode">Postal code:</div>
+                <textarea  id="postalcodeArea" maxlength="45"></textarea>
+            </div>
+
+            <div class="phone">
+                <div id ="phone">Phone:</div>
+                <textarea  id="phoneArea" maxlength="45"></textarea>
+            </div>
+            <button class = "save">Save</button>
+        </div>
+
     </div>
+
+    <!--<div class="employee">
+
+    </div>-->
 </body>
 <script src="http://localhost:5000/socket.io/socket.io.js"></script>
 <script src="../js/index.js"></script>

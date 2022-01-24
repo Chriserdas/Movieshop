@@ -24,7 +24,6 @@ console.log("Server running on port : " + server.address().port);
 
 
 
-
 io.on('connection', socket =>{
     console.log("Connection established");
 
@@ -92,6 +91,14 @@ io.on('connection', socket =>{
         
     });
 
+    socket.on("getFilms",()=>{
+        getFilms("film").then(results=>{
+                    
+            socket.emit("getFilms",results);
+            
+        });
+    });
+
     //------------------SERIES----------------------------
 
     socket.on('getSeries',data=>{
@@ -111,27 +118,16 @@ io.on('connection', socket =>{
         data = dataParser(data,",");
         getEpisodes(parseInt(data[0])).then(results=>{
             
-            //socket.emit("episodes",result);
+            
             
             getOwnedStatus(results,data[1]).then(array=>{
                 socket.emit("episodes",array);
             })
-                //socket.emit("episodes",result);
+            
             
         })
     });
 
-    /*socket.on('epRentStatus',data=>{
-        data = dataParser(data,",");
-        
-        checkEpisode(data[0],data[1]).then(result=>{
-            console.log(true+ data[1]);
-            socket.emit('checkedEpisode',true + data[1]);
-        }).catch(()=>{
-            console.log(false+ data[1]);
-            socket.emit('checkedEpisode',false + data[1]);
-        });
-    });*/
 
     socket.on('rentEpisode',data=>{
         data = dataParser(data,",");
@@ -145,8 +141,40 @@ io.on('connection', socket =>{
         });
     })
 
+    //----------------Owned------------------
+
+
+    socket.on("getOwned",customer_id=>{
+        getOwnedFilms(customer_id).then(films => {
+            getOwnedEpisodes(customer_id).then(episodes => {
+                socket.emit("Owned",{films,episodes});
+            });
+        });
+
+    });
+
+    //-----------------Account---------------------
+
+    socket.on('getCustomerInfo',customer_id=>{
+        console.log(customer_id);
+        getAccountInfo(customer_id).then(result =>{
+            socket.emit('takeCustomerInfo',result[0]);
+        });
+    });
+
+    socket.on("getCities",data=>{
+        getCities().then(result=>{
+            socket.emit("cities",result);
+        });
+    });
+
 });
 
+
+
+
+
+//--------------------functions--------------------------
 
 function dataParser(data,letter){
     return data.split(letter);
@@ -365,7 +393,6 @@ function getOwnedStatus(results,customer_id){
                 array.shift();
                 if(array.length == 0) resolve(episodesChecked);
             }).catch(()=>{
-                //console.log(array);
                 episodesChecked.push({result,owned:false});
                 array.shift();
                 if(array.length == 0) resolve(episodesChecked);
@@ -373,5 +400,90 @@ function getOwnedStatus(results,customer_id){
             
         }
         
+    })
+}
+
+function getOwnedFilms(customer_id){
+    
+    let query = "SELECT title, description, release_year,language.name as language, "+
+    "length, rating, category.name as category,film_rental.film_rental_date as rental_date FROM film " +
+    "inner join language on film.language_id = language.language_id " + 
+    "inner join film_category on film_category.film_id = film.film_id " +
+    "inner join category on category.category_id = film_category.category_id " +
+    "inner join film_rental on film_rental.film_id = film.film_id " +
+    "where film_rental.customer_id = ?"
+    
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,customer_id,(err, results)=>{
+            if(err) throw err;
+
+            else{
+                resolve(JSON.parse(JSON.stringify(results)));
+            }
+        });
+    })
+}
+
+function getOwnedEpisodes(customer_id){
+
+    let query = "SELECT episodes.title, episodes.description, series.release_year,language.name as language, " +
+    "length, rating, category.name as category,episode_rental.episode_rental_date as rental_date FROM episodes " +
+    "inner join seasons on seasons.season_id = episodes.season_id " +
+    "inner join series on seasons.serie_id = series.serie_id " +
+    "inner join language on series.language_id = series.language_id " +
+    "inner join serie_category on serie_category.serie_id = series.serie_id " +
+    "inner join category on category.category_id = serie_category.category_id " +
+    "inner join episode_rental on episode_rental.episode_id = episodes.episode_id " +
+    "where episode_rental.customer_id = ? " +
+    "GROUP BY episodes.title;"
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,customer_id,(err, results)=>{
+            if(err) throw err;
+
+            else{
+                resolve(JSON.parse(JSON.stringify(results)));
+            }
+        });
+    })
+}
+
+function getAccountInfo(customer_id){
+
+    let query = "select customer.first_name,customer.last_name,customer.email, customer.create_date,customer.active,customer.choice, "+
+    "address.address,address.district,city.city,country.country,address.postal_code, " +
+    "address.phone from customer " +
+    "inner join address on address.address_id = customer.address_id " +
+    "inner join city on address.city_id = city.city_id " +
+    "inner join country on city.country_id = country.country_id " +
+    "where customer.customer_id = ?"
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,customer_id,(err, results)=>{
+            if(err) throw err;
+
+            else{
+                resolve(JSON.parse(JSON.stringify(results)));
+            }
+        });
+    })
+}
+
+function getCities() {
+    let query = "SELECT city.city,country.country FROM city " +
+    "inner join country on country.country_id = city.country_id order by city.city ASC";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,(err, results)=>{
+            if(err) throw err;
+
+            else{
+                resolve(JSON.parse(JSON.stringify(results)));
+            }
+        });
     })
 }

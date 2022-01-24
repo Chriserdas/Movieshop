@@ -19,7 +19,7 @@ app.on('ready',()=>{
         },
         width,height,
         minWidth:1430,
-        minHeight:390,
+        minHeight:770,
         frame: false,
         titleBarStyle: 'customButtonsOnHover',
         

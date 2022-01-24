@@ -681,7 +681,7 @@ body {
     font-family:Oswald;
     outline:none;
     border:none;
-    animation: showContent 0.5s 6100ms forwards;
+    /*animation: showContent 0.5s 6100ms forwards;*/
 }
 
 .title{
@@ -766,7 +766,7 @@ body {
        bottom:-480px;  
     }
     100%{
-        bottom:190px;
+        bottom:160px;
     }
 }
 
@@ -774,7 +774,7 @@ body {
 @keyframes hideMovieInfo{
 
     0%{
-       bottom:190px;  
+       bottom:160px;  
     }
     100%{
         bottom:-480px;
@@ -928,9 +928,10 @@ body {
     font-size:25px;
     left:100px;
     top:70px;
+    opacity: 0;
     text-transform:uppercase;
     color:#F2E86D;
-    animation: showContent 0.5s 6100ms forwards;
+    /*animation: showContent 0.5s 6100ms forwards;*/
 }
 
 .seasonsDiv{
@@ -1068,3 +1069,524 @@ body {
     display:none;
 }
 
+.rentalDate{
+    position:absolute;
+    top:40%;
+    left:55%;
+    font-size:20px;
+    font-family:monospace;
+    color:#71DFBE;
+    padding:15px;
+    /*border:1px #71DFBE solid;*/
+    background-color:#0d121a
+}
+
+
+.accountDiv{
+    position:fixed;
+    top:45px;
+    left:2100px;
+    box-shadow:6px 10px 10px black;
+    width:calc(100vw - 120px);
+    height:100%;
+    color:white;
+    background-color:#0f1827;
+    /*animation: revealAccount 1.5s forwards cubic-bezier(0.03, 0.88, 0.76, 1.02);*/
+}
+
+@keyframes revealAccount{
+    0%{
+        left:2100px;
+    }
+    100%{
+        left:120px;
+    }
+}
+
+#account_title{
+    position:relative;
+    top:0%;
+    font-size:35px;
+    font-family:Oswald;
+    left:2%;
+    color:#71DFBE;
+}
+
+.firstname{
+    position:relative;
+    top:10%;
+    color:#71DFBE;
+    left:20%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+}
+
+#firstnameArea{
+    position:relative;
+    top:-3px;
+    left:5px;
+    color:white;
+    font-family:Oswald;
+    background-color:transparent;
+    border:none;
+    font-size:20px;
+    outline:none;
+    height:35px;
+    resize:none;
+    overflow-x:hidden;
+}
+
+#firstnameArea:focus{
+    border-bottom:1px white solid;
+   
+}
+
+#firstnameArea::placeholder{
+    font-weight:Oswald;
+    font-size:20px;
+    letter-spacing:1.1px;
+    color:white;
+}
+
+
+.lastname{
+    position:relative;
+    top:10%;
+    color:#71DFBE;
+    left:20%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+    margin-left:20px;
+}
+
+#lastnameArea{
+    position:relative;
+    top:-3px;
+    left:5px;
+    color:white;
+    font-family:Oswald;
+    background-color:transparent;
+    border:none;
+    font-size:20px;
+    outline:none;
+    height:35px;
+    resize:none;
+    overflow-x:hidden;
+}
+
+
+
+#lastnameArea:focus{
+    border-bottom:1px white solid;
+   
+}
+
+.email{
+    position:relative;
+    top:10%;
+    color:#71DFBE;
+    left:20%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+    margin-left:20px;
+}
+
+#emailtxt{
+    position:relative;
+    left:8px;
+    color:white;
+    top:-5px;
+    padding-left:10px;
+    background-color:#0c1018;
+    padding-right:20px;
+    padding-top:5px;
+    padding-bottom:5px;
+    border-radius:10px;
+}
+
+.createDate{
+    position:absolute;
+    top:30%;
+    color:#71DFBE;
+    left:17%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+    margin-left:20px;
+}
+
+#datetxt{
+    position:relative;
+    left:8px;
+    color:white;
+    top:-5px;
+    padding-left:10px;
+    padding-right:20px;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+.choice{
+    position:absolute;
+    left:36%;
+    top:30%;
+    display:inline-flex;
+}
+
+#choice_title{
+    position:relative;
+    top:0px;
+    left:0px;
+    font-size:20px;
+    color:#71DFBE;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+}
+
+#choice{
+    position:relative;
+    left:3%;
+    font-size:20px;
+    color:white;
+    background-color:transparent;
+
+}
+
+#choice:hover{
+    background-color:#1a263a;
+    cursor:pointer;
+}
+
+
+#chosen{
+    position:relative;
+    color:white;
+    font-size:20px;
+    border:none;
+    background-color:transparent;
+   padding-left:10px;
+   padding-top:5px;
+   padding-bottom:5px;
+   padding-right:5px;
+}
+
+#chosen:hover{
+    background-color:#1a263a;
+    cursor:pointer;
+}
+
+#down-button{
+    position:relative;
+
+    background-color:transparent;
+    color:white;
+    font-size:20px;
+    border:none;
+    transform:rotate(90deg);
+}
+
+#down-button:hover{
+    background-color:#1a263a;
+    cursor:pointer;
+}
+
+.choice-content{
+    position:absolute;
+    top:33px;
+    left:160px;
+    opacity:0;
+    transform:translateY(-10px);
+    transition:150ms ease-in;
+    background-color:#1a263a;
+    
+}
+
+#choice:focus-within{
+    background-color:#1a263a;
+}
+
+#choice:focus-within + .choice-content{
+    opacity:1;
+    transform:translateY(0);
+}
+
+
+
+#choice1,#choice2{
+    position:relative;
+    padding:5px;
+    padding-right:18px;
+    padding-left:20px;
+    width:100%;
+    font-size:20px;
+    color:white;
+    background-color:transparent;
+    border:none;
+    pointer-events:none;
+}
+
+
+#choice1:hover,#choice2:hover{
+    cursor:pointer;
+    background-color:#202e44;
+}
+
+#choice:focus-within + .choice-content > #choice1,#choice2{
+    opacity:1;
+    pointer-events:auto;
+    transform:translateY(0);
+}
+
+#choice1:active,#choice2:active{
+    pointer-events:auto;
+}
+
+.address{
+    position:absolute;
+    top:30%;
+    color:#71DFBE;
+    left:59%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+    margin-left:20px;
+}
+
+#addressArea{
+    position:relative;
+    top:-3px;
+    left:5px;
+    color:white;
+    font-family:Oswald;
+    background-color:transparent;
+    border:none;
+    font-size:20px;
+    outline:none;
+    height:35px;
+    resize:none;
+    overflow-x:hidden;
+}
+
+
+
+#addressArea:focus{
+    border-bottom:1px white solid;
+}
+
+.city{
+    position:absolute;
+    left:20%;
+    top:45%;
+    display:inline-flex;
+}
+
+#city{
+    position:relative;
+    top:0px;
+    left:0px;
+    font-size:20px;
+    color:#71DFBE;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+}
+
+#city-choosed{
+    position:relative;
+    left:10px;
+}
+
+#city_chosen{
+    position:relative;
+    color:white;
+    font-size:20px;
+    border:none;
+    background-color:transparent;
+   padding-left:10px;
+   padding-top:5px;
+   padding-bottom:5px;
+   padding-right:5px;
+}
+
+.city-content{
+    position:absolute;
+    top:33px;
+    height:400px;
+    left:48px;
+    opacity:0;
+    transform:translateY(-10px);
+    transition:150ms ease-in;
+    background-color:#1a263a;
+    overflow-y:scroll;
+    z-index:1;
+}
+
+#city-choosed:hover{
+    background-color:#1a263a;
+    cursor:pointer;
+}
+
+#city-choosed:focus-within{
+    background-color:#1a263a;
+}
+
+#city-choosed:focus-within + .city-content{
+    opacity:1;
+    transform:translateY(0);
+}
+
+#city_chosen:hover{
+    background-color:#1a263a;
+    cursor:pointer;
+}
+
+.cityButton{
+   position:relative;
+    padding:5px;
+    padding-right:18px;
+    padding-left:20px;
+    width:100%;
+    font-size:20px;
+    color:white;
+    background-color:transparent;
+    border:none;
+    pointer-events:none;
+}
+
+#city-choosed:focus-within + .city-content > .cityButton{
+    opacity:1;
+    pointer-events:auto;
+    transform:translateY(0);
+}
+
+.cityButton:hover{
+    cursor:pointer;
+    background-color:#202e44;
+}
+
+.cityButton:focus-within{
+    pointer-events:auto;
+}
+
+.city-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.city-content::-webkit-scrollbar-track {
+    border-radius:0%;
+}
+
+.city-content::-webkit-scrollbar-thumb {
+      border-radius:0%;
+}
+
+.country{
+    position:absolute;
+    top:45%;
+    color:#71DFBE;
+    left:38%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+    margin-left:20px;
+}
+
+#countryname{
+    position:relative;
+    left:8px;
+    color:white;
+    top:-5px;
+    padding-left:10px;
+    padding-right:20px;
+    padding-top:5px;
+    padding-bottom:5px;
+}
+
+.district{
+    position:absolute;
+    top:45%;
+    color:#71DFBE;
+    left:59%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+    margin-left:20px;
+}
+
+#districtArea,#postalcodeArea,#phoneArea{
+    position:relative;
+    top:-3px;
+    left:5px;
+    color:white;
+    font-family:Oswald;
+    background-color:transparent;
+    border:none;
+    font-size:20px;
+    outline:none;
+    height:35px;
+    resize:none;
+    overflow-x:hidden;
+}
+
+
+
+#districtArea:focus,#postalcodeArea:focus,#phoneArea:focus{
+    border-bottom:1px white solid;
+}
+
+.postalcode{
+    position:absolute;
+    top:60%;
+    color:#71DFBE;
+    left:32%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+    margin-left:20px;
+    z-index:0;
+}
+
+.phone{
+     position:absolute;
+    top:60%;
+    color:#71DFBE;
+    left:50%;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:20px;
+    display:inline-flex;
+    margin-left:20px;
+    
+}
+
+.save{
+    position:absolute;
+    top:75%;
+    left:43%;
+    font-family:Oswald;
+    font-size:30px;
+    color:white;
+    background-color:transparent;
+    border:2px #71DFBE solid;
+    outline:none;
+    padding:5px 20px;
+    letter-spacing:1.1px;
+    transition:0.2s ease-out;
+}
+
+.save:hover{
+    color:#0f1827;
+    background-color:#71DFBE;
+    transform:scale(0.95);
+    cursor:pointer;
+}

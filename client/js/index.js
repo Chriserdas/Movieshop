@@ -32,7 +32,7 @@ let customer_choice;
 let admin_var_name = "admin";
 let employee_var_name = "employee";
 
-
+let startCount = 0;
 
 //--------------------customer--------------------
 
@@ -40,7 +40,7 @@ let films = document.querySelector("#films");
 let series = document.querySelector("#series");
 let owned = document.querySelector("#owned");
 let account = document.querySelector("#account");
-
+let category = document.querySelector("#type-name");
 let divClicked = films;
 
 
@@ -90,16 +90,15 @@ function capitalizeFirstLetter(string) {
 
 
 series.addEventListener('click',()=>{
-    document.querySelector('.movieInfo').style.bottom = "-480px"
     series.style.backgroundColor = "#4d30d5";
     divClicked.style.backgroundColor = "";
     divClicked = series;
     document.querySelector('.content').innerHTML = "";
-    
+    category.innerHTML = "Series";
 
     if(customer_choice == 'FS'  || customer_choice == 'S'){
         socket.emit('getSeries','');
-
+        
         socket.on('takeSeries',series=>{
             document.querySelector('.content').innerHTML = "";
             createSeries(series);
@@ -109,9 +108,65 @@ series.addEventListener('click',()=>{
 });
 
 
+films.addEventListener("click", ()=>{
+    films.style.backgroundColor = "#4d30d5";
+    divClicked.style.backgroundColor = "";
+    
+    category.innerHTML = "Movies";
+    divClicked = films;
+    document.querySelector('.content').innerHTML = "";
+
+    if(customer_choice == 'FS'  || customer_choice == 'F'){
+        socket.emit('getFilms','');
+        
+        socket.on('takeFilms',movies=>{
+            
+            createMovie(movies);
+        });
+    }
+    else notRegistered();
+});
+
+
+owned.addEventListener('click',()=>{
+    owned.style.backgroundColor = "#4d30d5";
+    divClicked.style.backgroundColor = "";
+    divClicked = owned;
+    document.querySelector('.content').innerHTML = "";
+    category.innerHTML = "Owned";
+    socket.emit('getOwned',id)
+    socket.on('Owned',results=>{
+        let movies_count = document.createElement("div");
+        let amount = results.films.length + results.episodes.length;
+        document.querySelector('.content').innerHTML = "";
+        movies_count.appendChild(document.createTextNode(amount + " movies"));
+        movies_count.className = "movie-count";
+        movies_count.style.opacity = "1";
+        document.querySelector('.content').appendChild(movies_count);
+        for(let result in results){
+            createOwned(results[result]);
+        }
+        
+    });
+});
+
+account.addEventListener('click',()=>{
+    
+    account.style.backgroundColor = "#4d30d5";
+    divClicked.style.backgroundColor = "";
+    divClicked = account;
+    document.querySelector('.content').innerHTML = "";
+    
+    socket.emit('getCustomerInfo',id);
+
+    socket.on('takeCustomerInfo',data=>{
+        createAccountInfo(data);
+    });
+
+});
+
 
 signin.addEventListener('click',(e)=>{
-    
     
     if(firstname.value.length !=0 && lastname.value.length !=0 && email.value.length !=0){
         e.preventDefault();
@@ -130,10 +185,8 @@ signin.addEventListener('click',(e)=>{
             else notRegistered();
             
         });
-
         
     }
- 
 });
 
 
@@ -189,7 +242,6 @@ function checkCredentials(isAuthenticated){
             email.value ="";
 
         },5000);
-
     }
 }
 
@@ -234,20 +286,34 @@ function createCategories(socket){
     });
 }
 
-function createMovie(movies){
 
+function createMovie(movies){
+    document.querySelector(".accountDiv").style.display = "none";
+    document.querySelector('.content').innerHTML = "";
+    document.querySelector('.movieInfo').style.display = "none";
+    document.querySelector('.content').style.animation = "none";
+    document.querySelector('.content').style.opacity= "1";
     let movies_count = document.createElement("div");
     
     movies_count.appendChild(document.createTextNode(movies.length + " movies"));
     movies_count.className = "movie-count";
+    
     document.querySelector('.content').appendChild(movies_count);
     
-
+    ++startCount;
     for(let movie of movies){
         let movieDiv = document.querySelector('.movieInfo');
         let button = document.createElement("button");
         let img = document.createElement("img");
-        
+        if(startCount === 1) {
+            button.style.animation = "showContent 0.5s 6100ms forwards"
+            movies_count.style.animation = "showContent 0.5s 6100ms forwards"
+        }
+
+        else {
+            button.style.opacity = "1"
+            movies_count.style.opacity = "1";
+        };
 
         img.setAttribute("src", "../icons/film-image.jpg");
         img.setAttribute("width", "200px");
@@ -281,7 +347,7 @@ function createMovie(movies){
         button.addEventListener('click',()=>{
             
             socket.emit("getFilmBuyStatus",id + "," + movie.film_id);
-
+            document.querySelector('.movieInfo').style.display = "block";
             
             socket.on('checkedFilm',answer=>{
                 createStandardMovieInfoHtml(button,movieDiv,movie);
@@ -343,6 +409,7 @@ function createOwnedButton() {
 }
 
 function createStandardMovieInfoHtml(button,movieDiv,movie){
+
     document.querySelector(".content").scrollTop = button.offsetTop - 20;
     movieDiv.innerHTML = "";
     movieDiv.style.animation = "showMovieInfo .6s forwards "
@@ -369,7 +436,6 @@ function createStandardMovieInfoHtml(button,movieDiv,movie){
     let rating = document.createTextNode(movie.rating);
 
     
-
     titleInMovieInfoDiv.className = "titleInMovieInfoDiv";
     yearInMovieInfoDiv.className = "yearInMovieInfoDiv";
     discriprionDiv.className = "discriprionDiv";
@@ -411,18 +477,20 @@ function createStandardMovieInfoHtml(button,movieDiv,movie){
 }
 
 function createSeries(movies){
-    
+    document.querySelector(".accountDiv").style.display = "none";
+    document.querySelector('.movieInfo').style.display = "none";
     document.querySelector('.content').style.animation = "none";
     document.querySelector('.content').style.opacity= "1";
     let movies_count = document.createElement("div");
     
-
+    movies_count.style.opacity = "1";
     movies_count.appendChild(document.createTextNode(movies.length + " series"));
     movies_count.className = "movie-count";
     document.querySelector('.content').appendChild(movies_count);
     
 
     for(let movie of movies){
+
         let button = document.createElement("button");
         let img = document.createElement("img");
         
@@ -457,21 +525,11 @@ function createSeries(movies){
         button.appendChild(imgDiv);
         
         document.querySelector('.content').appendChild(button);
-        
 
         button.addEventListener('click',()=>{
             
-            /*socket.emit('getSeasons',movie.serie_id);
-
-            socket.on('takeSeasons',seasons =>{
-                
-                console.log(seasons);
-                /*createStandardMovieInfoHtml(button,document.querySelector('.movieInfo'),movie);
-                document.querySelector('.lengthDiv').style.display = "none";
-                document.querySelector('.ratingDiv').style.marginLeft = "475px";
-                createSeasons(seasons,movie);
-            });*/
             waitForSocket(movie,button).then(seasons =>{
+                document.querySelector('.movieInfo').style.display = "block";
                 createSeasons(seasons,movie);
             });
             
@@ -484,7 +542,6 @@ function createSeries(movies){
 function createSeasons(seasons,movie) {
     let seasonsDiv = document.createElement('div');
     seasonsDiv.className = "seasonsDiv";
-    
     
     for(let season of seasons) {
     
@@ -500,14 +557,6 @@ function createSeasons(seasons,movie) {
         seasonButton.addEventListener('click',()=>{
             
             waitForEpisodes(season,movie).then(episodes=>{
-                /*for(let episode of episodes){
-                    
-                    createEpisodes(episodes,season,movie).then(data=>{
-                        console.log(data);
-                       
-                    });
-                                
-                }*/
                 createEpisodes(episodes,season,movie);
             })
             
@@ -517,7 +566,7 @@ function createSeasons(seasons,movie) {
 }
 
 function createEpisodes(episodes,season,movie) {
-
+    document.querySelector(".accountDiv").style.display = "none";
     let seasonDiv = document.createElement("div");
     let seasonNumber = document.createTextNode("SEASON " + season.season_number);
     let movieInfo = document.querySelector(".movieInfo");
@@ -539,13 +588,13 @@ function createEpisodes(episodes,season,movie) {
 
     backButton.addEventListener("click", ()=>{
         socket.emit('getSeasons',movie.serie_id);
-            socket.on('takeSeasons',seasons =>{
-                
-                createStandardMovieInfoHtml(backButton,movieInfo,movie);
-                document.querySelector('.lengthDiv').style.display = "none";
-                document.querySelector('.ratingDiv').style.marginLeft = "475px";
-                createSeasons(seasons,movie);
-            });
+        socket.on('takeSeasons',seasons =>{
+            
+            createStandardMovieInfoHtml(backButton,movieInfo,movie);
+            document.querySelector('.lengthDiv').style.display = "none";
+            document.querySelector('.ratingDiv').style.marginLeft = "475px";
+            createSeasons(seasons,movie);
+        });
     });
 
     for(let episode of episodes){
@@ -651,14 +700,162 @@ function waitForEpisodes(season){
 
         socket.emit("getEpisodes",season.season_id + "," + id);
             
-            socket.on("episodes",episodes=>{
-                document.querySelector(".movieInfo").innerHTML = "";
-                resolve(episodes);
-            });
+        socket.on("episodes",episodes=>{
+            document.querySelector(".movieInfo").innerHTML = "";
+            resolve(episodes);
+        });
     })
     
 }
 
 
+function createOwned(movies){
+    document.querySelector(".accountDiv").style.display = "none";
+    document.querySelector('.movieInfo').style.display = "none";
+    document.querySelector('.content').style.animation = "none";
+    document.querySelector('.content').style.opacity= "1";
+   
+    
+    ++startCount;
+    for(let movie of movies){
+        let movieDiv = document.querySelector('.movieInfo');
+        let button = document.createElement("button");
+        let img = document.createElement("img");
+        if(startCount === 1) button.style.animation = "showContent 0.5s 6100ms forwards"
+
+        else button.style.opacity = "1";
+
+        img.setAttribute("src", "../icons/film-image.jpg");
+        img.setAttribute("width", "200px");
+        img.setAttribute('height', "250px");
+
+        
+        let title = document.createTextNode(movie.title);
+        let year = document.createTextNode(movie.release_year);
+
+        let imgDiv = document.createElement("div");
+        let titleDiv = document.createElement("div");
+        let yearDiv = document.createElement("div");
+
+        
+        imgDiv.className = "imgDiv";
+        titleDiv.className = "title";
+        yearDiv.className = "year";
+        button.className = "movieDiv"
+
+        titleDiv.appendChild(title);
+        yearDiv.appendChild(year);
+        imgDiv.appendChild(img);
+
+        button.appendChild(titleDiv);
+        button.appendChild(yearDiv);
+        button.appendChild(imgDiv);
+        
+        document.querySelector('.content').appendChild(button);
+        
+
+        button.addEventListener('click',()=>{
+            
+            document.querySelector('.movieInfo').style.display = "block";
+            
+            createStandardMovieInfoHtml(button,movieDiv,movie);
+            let datestr = movie.rental_date.toString();
+            let date = new Date(datestr);
+            let rentalDate = document.createElement('div');
+            let rentalDatetxt = document.createTextNode("Rent on: " + date.getDate() + "-" + (date.getUTCMonth() +1) + "-" + date.getUTCFullYear());
+
+            rentalDate.className = "rentalDate";
+            rentalDate.appendChild(rentalDatetxt);
+            document.querySelector('.movieInfo').appendChild(rentalDate);
+
+        });
+    }
+}
+
+function createAccountInfo(data){
+    
+    socket.emit("getCities","");
+    let accountDiv = document.querySelector(".accountDiv");
+    accountDiv.style.display = "block";
+    accountDiv.style.animation = "revealAccount 1s forwards cubic-bezier(0.03, 0.88, 0.76, 1.02)"
+    let firstname = document.querySelector("#firstnameArea");
+    firstname.innerHTML  = data.first_name
+    let choice = document.querySelector("#chosen");
+    let choice1 = document.querySelector("#choice1");
+    let choice2 = document.querySelector("#choice2");
+    let address = document.querySelector("#addressArea");
+    let district = document.querySelector("#districtArea");
+    let postalCode = document.querySelector("#postalcodeArea");
+    let phone = document.querySelector("#phoneArea");
+
+    district.innerHTML = data.district;
+    postalCode.innerHTML = data.postal_code;
+    phone.innerHTML = data.phone;
+
+    let cityname = document.querySelector("#city_chosen");
+    cityname.innerHTML = data.city;
+    address.innerHTML = data.address;
+
+    let countryname = document.querySelector("#countryname");
+    countryname.innerHTML = data.country;
+    let lastname = document.querySelector("#lastnameArea");
+    lastname.innerHTML  = data.last_name
+
+    let email = document.querySelector("#emailtxt");
+    email.innerHTML = data.email;
+
+    let date = document.querySelector("#datetxt");
+    let datestr = data.create_date.toString();
+    let dateUtc = new Date(datestr);
+    let dateFinal = dateUtc.getDate() + "-" + (dateUtc.getMonth()+1) + "-" + dateUtc.getUTCFullYear();
+
+    date.innerHTML = dateFinal.toString();
+
+    if(customer_choice == 'FS'){
+        choice.innerHTML = "Films and Series";
+        choice1.innerHTML = "Films"
+        choice2.innerHTML = "Series"
+    }
+    else if(customer_choice == 'S'){
+        choice.innerHTML = "Series";
+        choice1.innerHTML = "Films"
+        choice2.innerHTML = "Films and Series"
+    }
+    else if(customer_choice == 'F'){
+        choice.innerHTML = "Films";
+        choice1.innerHTML = "Series"
+        choice2.innerHTML = "Films and Series"
+    }
+
+    changeInnerHtml(choice1,choice);
+    changeInnerHtml(choice2,choice);
+    socket.on('cities',cities=>{
+        document.querySelector(".city-content").innerHTML = "";
+        for(let city of cities){
+            let cityButton = document.createElement('button');
+            let citytxt = document.createTextNode(city.city);
+
+            cityButton.className = 'cityButton';
+            cityButton.appendChild(citytxt);
+
+            document.querySelector(".city-content").appendChild(cityButton);
+
+            cityButton.addEventListener('focus',()=>{
+                changeInnerHtml(cityButton,cityname);
+                countryname.innerHTML = city.country;
+            });
+        }
+        
+    });
+    
+}
+
+function changeInnerHtml(button,buttonToSwitch){
+    button.addEventListener('click',()=>{
+        let choiceText = buttonToSwitch.innerHTML;
+        buttonToSwitch.innerHTML = button.innerHTML;
+        button.innerHTML = choiceText;
+    })
+}
 
 
