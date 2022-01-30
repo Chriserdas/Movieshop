@@ -3,16 +3,12 @@ const { ipcMain } = require('electron');
 
 const path = require('path');
 
-
-
-
 app.on('ready',()=>{
     const primaryDisplay = screen.getPrimaryDisplay();
     const {width,height} = primaryDisplay.workAreaSize;
 
     var win = new BrowserWindow({
         webPreferences:{ 
-            enableRemoteModule: true,
             webSecurity:false,
             nodeIntegration: true,
             contextIsolation: false

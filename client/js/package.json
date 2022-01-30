@@ -11,7 +11,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^16.0.5"
+    "electron": "^16.0.8",
+    "electron-chromedriver": "^16.0.0"
   },
   "dependencies": {
     "@electron/remote": "^2.0.1",
