@@ -1,11 +1,13 @@
 --STORE 3.1
+DROP PROCEDURE IF EXISTS most_rent;
+DELIMITER $
 CREATE DEFINER=`root`@`localhost` PROCEDURE `most_rent`(IN lt CHAR(1), IN number INT, IN imerominia1 DATE, IN imerominia2 DATE)
 BEGIN
 IF(lt like 'm') THEN 
 
 SELECT film.title, film.film_id 
-FROM film INNER JOIN film_inventory ON film_inventory.film_id = film.film_id
-INNER JOIN film_rental ON film_rental.film_inventory_id = film_inventory.film_inventory_id
+FROM film 
+INNER JOIN film_rental ON film_rental.film_id = film.film_id
 WHERE film_rental.film_rental_date BETWEEN imerominia1 AND imerominia2
 GROUP BY film_id
 ORDER BY count(*) DESC 
@@ -14,8 +16,7 @@ ELSEIF(lt like 's') THEN
 SELECT serie.title, serie.serie_id, count(*) 
 FROM serie INNER JOIN seasons ON serie.serie_id = season.serie_id
 INNER JOIN episodes ON episodes.season_id = season.season_id
-INNER JOIN episode_inventory ON episodes.episode_id = episode_inventory.episode_id
-INNER JOIN episode_rental ON episode_inventory.episode_inventory_id = episode_rental.episode_inventory_id
+INNER JOIN episode_rental ON episode_rental.episode_id= episodes.episode_id
 WHERE episode_rental.episode_rental_date BETWEEN imerominia1 AND imerominia2
 GROUP BY serie.serie_id
 ORDER BY count(*) DESC 
@@ -23,7 +24,7 @@ LIMIT number;
 ELSE
 SELECT 'wrong input choice';
 END IF;
-END
+END$
 
 
 --STORE 3.2
