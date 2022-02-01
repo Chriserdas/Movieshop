@@ -101,7 +101,6 @@ io.on('connection', socket =>{
 
     socket.on("getFilms",()=>{
         getFilms("film").then(results=>{
-                    
             socket.emit("getFilms",results);
             
         });
@@ -206,7 +205,9 @@ io.on('connection', socket =>{
     });
 
     socket.on('new film',data=>{
-        console.log(data);
+        insertNewFilm(data.title,data.description,data.release_year,data.language,data.length,data.rating).then(()=>{
+            socket.emit('deleted film',"");
+        })
     });
 
     socket.on('modify film',data=>{
@@ -281,6 +282,36 @@ io.on('connection', socket =>{
         })
     });
 
+    socket.on('new city',data=>{
+        data = dataParser(data,",");
+        insertCity(data[0],data[1]).then(()=>{
+            socket.emit('deleted city','');
+        })
+    })
+
+    socket.on('delete city',data=>{
+        deleteFromTable('city','city_id',data).then(()=>{
+            socket.emit('deleted city',"")
+        })
+    });
+
+    socket.on('getAddresses',data=>{
+        getAddresses().then(results=>{
+            socket.emit('takeAddresses',results);
+        });
+    });
+
+    socket.on('delete address',data=>{
+        deleteFromTable('address','address_id',data).then(results=>{
+            socket.emit('deleted address',"");
+        })
+    })
+
+    socket.on('new address',data=>{
+        insertIntoAddress(data).then(results=>{
+            socket.emit('deleted address',"");
+        })
+    })
 });
 
 
@@ -347,12 +378,13 @@ function getFilms(tableName){
 
     return new Promise((resolve, reject)=>{
 
-        let query = "SELECT film.film_id,title, description, release_year,language.name as language , length, rating, category.name as category FROM film inner join language on film.language_id = language.language_id inner join film_category on film_category.film_id = film.film_id inner join category on category.category_id = film_category.category_id ORDER BY title asc;"
+        let query = "SELECT film_id,title, description, release_year,language.name as language , length, rating, category.name as category FROM film inner join language on film.language_id = language.language_id inner join film_category on film_category.film_id = film.film_id inner join category on category.category_id = film_category.category_id ORDER BY title asc;"
 
         connection.query(query,(err, results) =>{
             if(err) throw err;
 
             else{
+                console.log(results);
                resolve(JSON.parse(JSON.stringify(results)));
             }
         })
@@ -714,3 +746,57 @@ function insertOneValue(tableName, valuename, value) {
     });
 }
 
+function insertCity(city,country){
+    let query = "insert into city (city,country_id) values(?, "+
+    "(select country_id from country where country.country = ?))";
+
+    return new Promise((resolve, reject) => {
+        connection.query(query,[city,country],(err, results)=>{
+            if(err) throw err;
+
+            else resolve();
+        });
+    });
+}
+
+
+function getAddresses(){
+
+    let query = "select address.address_id,address.address,address.district,city.city,address.postal_code,address.phone "+
+    "from address "+
+    "inner join city on city.city_id = address.city_id order by address asc";
+
+    return new Promise((resolve, reject) => {
+        connection.query(query,(err, results)=>{
+            if(err) throw err;
+
+            else resolve(JSON.parse(JSON.stringify(results)));
+        });
+    });
+}
+
+function insertIntoAddress(array){
+    let query = "INSERT INTO address(address,district,city_id,postal_code,phone) "+
+    "values(?,?,(select city_id from city where city.city = ?),?,?);";
+
+    return new Promise((resolve, reject) => {
+        connection.query(query,array,(err, results)=>{
+            if(err) throw err;
+
+            else resolve(JSON.parse(JSON.stringify(results)));
+        });
+    });
+}
+
+function insertNewFilm(title,description,release_year,language,length,rating){
+
+    let query = "Insert into film(title, description, release_year, language_id,length,rating) " +
+    "values(?,?,?,(select language.language_id from language where language.name = ?),?,?)";
+
+    return new Promise((resolve, reject) => {
+        connection.query(query,[title,description,release_year,language,length,rating],(err, results)=>{
+            if(err) throw err;
+            resolve(results);
+        });
+    });
+}

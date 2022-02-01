@@ -194,7 +194,7 @@ account.addEventListener('click',()=>{
 
 customers_employee.addEventListener('click',()=>{
     customers_employee.style.backgroundColor = "#4d30d5";
-
+    document.querySelector('.address-content').style.display = "none";
     if(employeedivClicked != customers_employee) employeedivClicked.style.backgroundColor = "";
     
     employeedivClicked = customers_employee;
@@ -211,7 +211,7 @@ customers_employee.addEventListener('click',()=>{
 
 rental_employee.addEventListener('click',()=>{
     rental_employee.style.backgroundColor = "#4d30d5";
-
+    document.querySelector('.address-content').style.display = "none";
     if(employeedivClicked != rental_employee) employeedivClicked.style.backgroundColor = "";
     
     employeedivClicked = rental_employee;
@@ -227,6 +227,7 @@ rental_employee.addEventListener('click',()=>{
 });
 
 info_employee.addEventListener('click',()=>{
+    document.querySelector('.address-content').style.display = "none";
     info_employee.style.backgroundColor = "#4d30d5";
     
     if(employeedivClicked != info_employee) employeedivClicked.style.backgroundColor = "";
@@ -1115,6 +1116,7 @@ function createRental(customers){
 }
 
 function createInfo() {
+    document.querySelector('.address-content').style.display = "none";
     let movieInfo = document.querySelector(".employee .movieInfo");
     let buttonsDiv = document.createElement("div");
     let close = document.createElement("button");
@@ -1199,6 +1201,7 @@ function createInfo() {
        
     });
     actorButton.addEventListener('click',()=>{
+        document.querySelector('.address-content').style.display = "none";
         movieInfo.style.display='none';
         contentDiv.style.animation = "animateInfoContent .5s forwards cubic-bezier(0.4, 0, 1, 1)"
         contentDiv.style.display='block'; 
@@ -1296,6 +1299,7 @@ function createInfo() {
 
 
     moviesButton.addEventListener('click',()=>{
+        document.querySelector('.address-content').style.display = "none";
         contentDiv.style.animation = "animateInfoContent .5s forwards cubic-bezier(0.4, 0, 1, 1)"
         contentDiv.style.display='block'; 
         movieInfo.style.display='none';
@@ -1324,7 +1328,7 @@ function createInfo() {
                 movieInfo.style.animation = "showMovieInfo .6s forwards ";
                 movieInfo.innerHTML = "";
                 
-                createFilmHtml("","","","","","",'add film','new film' );
+                createFilmHtml("","","","Choose language","","Choose rating",'add film','new film',"Choose category","" );
             });
 
             for(let film of films){
@@ -1334,7 +1338,7 @@ function createInfo() {
                     movieInfo.style.animation = "showMovieInfo .6s forwards ";
                     movieInfo.innerHTML = "";
                     
-                    createFilmHtml(film.title,film.description, film.release_year, film.language,film.length,film.rating,"modify/delete film","modify film");
+                    createFilmHtml(film.title,film.description, film.release_year, film.language,film.length,film.rating,"modify/delete film","modify film",film.category,film.film_id);
                     let deleteDiv = document.createElement("button");
                     deleteDiv.className = "deleteDiv";
                     deleteDiv.appendChild(document.createTextNode("Delete"));
@@ -1354,6 +1358,7 @@ function createInfo() {
     })
 
     seriesButton.addEventListener('click',()=>{
+        document.querySelector('.address-content').style.display = "none";
         contentDiv.style.animation = "animateInfoContent .5s forwards cubic-bezier(0.4, 0, 1, 1)"
         contentDiv.style.display='block'; 
         movieInfo.style.display='none';
@@ -1379,7 +1384,7 @@ function createInfo() {
                 movieInfo.style.animation = "showMovieInfo .6s forwards ";
                 movieInfo.innerHTML = "";
                 
-                createFilmHtml("","","","","-","",'add series','new series' );
+                createFilmHtml("","","","Choose language","-","Choose rating",'add series','new series',"Choose Category","" );
             });
 
             for(let film of series){
@@ -1389,7 +1394,7 @@ function createInfo() {
                     movieInfo.style.animation = "showMovieInfo .6s forwards ";
                     movieInfo.innerHTML = "";
                     
-                    createFilmHtml(film.title,film.description, film.release_year, film.language,"-",film.rating,"modify/delete series","modify series");
+                    createFilmHtml(film.title,film.description, film.release_year, film.language,"-",film.rating,"modify/delete series","modify series",film.category,film.serie_id);
                     let deleteDiv = document.createElement("button");
                     deleteDiv.className = "deleteDiv";
                     deleteDiv.appendChild(document.createTextNode("Delete"));
@@ -1411,6 +1416,7 @@ function createInfo() {
     });
 
     languageButton.addEventListener('click',()=>{
+        document.querySelector('.address-content').style.display = "none";
         contentDiv.style.animation = "animateInfoContent .5s forwards cubic-bezier(0.4, 0, 1, 1)"
         contentDiv.style.display='block'; 
         movieInfo.style.display='none';
@@ -1467,6 +1473,7 @@ function createInfo() {
     });
 
     categoryButton.addEventListener('click',()=>{
+        document.querySelector('.address-content').style.display = "none";
         contentDiv.style.animation = "animateInfoContent .5s forwards cubic-bezier(0.4, 0, 1, 1)"
         contentDiv.style.display='block'; 
         movieInfo.style.display='none';
@@ -1523,6 +1530,7 @@ function createInfo() {
 
 
     countryButton.addEventListener('click',()=>{
+        document.querySelector('.address-content').style.display = "none";
         contentDiv.style.animation = "animateInfoContent .5s forwards cubic-bezier(0.4, 0, 1, 1)"
         contentDiv.style.display='block'; 
         movieInfo.style.display='none';
@@ -1578,6 +1586,7 @@ function createInfo() {
     });
 
     cityButton.addEventListener('click',()=>{
+        document.querySelector('.address-content').style.display = "none";
         contentDiv.style.animation = "animateInfoContent .5s forwards cubic-bezier(0.4, 0, 1, 1)"
         contentDiv.style.display='block'; 
         movieInfo.style.display='none';
@@ -1591,13 +1600,8 @@ function createInfo() {
         clicked.style.borderBottom = "1px white solid";
         clicked.style.letterSpacing = "3.1px";
 
-       
-        
         waitToGetFilms('getCities',"cities").then(cities=>{
-            
-            waitToGetFilms('getCountries',"takeCountries").then(countries=>{
-               console.log(countries);
-            })
+
             contentDiv.innerHTML = "";
             let addcategoryButton = document.createElement("button");
             addcategoryButton.appendChild(document.createTextNode("add city"));
@@ -1607,33 +1611,87 @@ function createInfo() {
             name.id = "add_category_area";
             contentDiv.appendChild(name)
             contentDiv.appendChild(addcategoryButton);
-            
+            let countryTitle = document.createElement('button');
             addcategoryButton.addEventListener('click',() => {
                 name.style.display = 'block';
-            });
 
-            name.addEventListener('keypress',event => {
-                if(event.key == "Enter" && name.value!=0 ) {
-                    event.preventDefault();
-                    if(countries.some(e =>e.country == capitalizeFirstLetter(name.value)) == 0){
-                        socket.emit("new city",capitalizeFirstLetter(name.value));
-                        name.value = "";
-                    }
-                    else{
-                        name.value = "Already exists"
-                    }
+                waitToGetFilms('getCountries',"takeCountries").then(countries=>{
                     
-                }
+                    let countriesDiv = document.createElement('div');
+                    countryTitle.appendChild(document.createTextNode("choose country"));
+                    countryTitle.style.border = "1px white solid";
+                    countriesDiv.className = 'countryChoose'
+                    countriesDiv.appendChild(countryTitle);
+                    let countriesContent = document.createElement('div');
+                    countriesDiv.appendChild(countriesContent);
+                    countriesContent.className = 'countryContent';
+    
+                    contentDiv.appendChild(countriesDiv);
+
+                    for(let country of countries) {
+                        let button = document.createElement('button');
+                        button.appendChild(document.createTextNode(country.country));
+                        countriesContent.appendChild(button);
+                        button.addEventListener('focus', () =>{
+                            countryTitle.innerHTML = button.innerHTML;
+                        });
+                    }
+
+                })
+            });
+            name.addEventListener('keypress',event => {
+                if(event.key == "Enter"){
+                    event.preventDefault();
+                    if(name.value!=0 && countryTitle.innerHTML != "choose country") {
+                        if(cities.some(e =>e.city == capitalizeFirstLetter(name.value)) == 0){
+                            socket.emit("new city",capitalizeFirstLetter(name.value) + "," + countryTitle.innerHTML);
+                            name.value = "";
+                        }
+                        else{
+                            name.value = "Already exists"
+                        }
+                    }
+                    else if(countryTitle.innerHTML == "choose country"){
+                        name.value = "choose country first"
+                    }
+                }                            
             })
+            
             
             for(let city of cities){
                 createOneRowDivs(city.city,contentDiv, "delete city", city.city_id);
             }
             socket.on('deleted city',data =>{
                 contentDiv.innerHTML = "";
-                countryButton.click();
+                cityButton.click();
             });
         });
+    });
+
+    addressButton.addEventListener('click',()=>{
+        document.querySelector('.address-content').style.display = "none";
+        contentDiv.style.animation = "animateInfoContent .5s forwards cubic-bezier(0.4, 0, 1, 1)"
+        contentDiv.style.display='block'; 
+        movieInfo.style.display='none';
+        contentDiv.innerHTML = "";
+        contentDiv.appendChild(close);
+        if(clicked != addressButton){
+            clicked.style.borderBottom = "";
+            clicked.style.letterSpacing = "";
+        }
+        clicked = addressButton;
+        clicked.style.borderBottom = "1px white solid";
+        clicked.style.letterSpacing = "3.1px";
+
+        waitToGetFilms("getAddresses",'takeAddresses').then(addresses=>{
+            contentDiv.innerHTML = "";
+            createAddress(contentDiv,addresses);
+
+            socket.on('deleted address',data=>{
+                contentDiv.innerHTML = "";
+                addressButton.click();
+            });
+        })
     });
             
 }
@@ -1686,7 +1744,7 @@ function createFilms(film,count,contentDiv,films) {
 }
 
 
-function createFilmHtml(title,description,release_year,language,length,rating,divtitle,socketmessage){
+function createFilmHtml(title,description,release_year,language,length,rating,divtitle,socketmessage,category,film_id){
     let movieInfo = document.querySelector(".employee .movieInfo");
     let titleDiv = document.createElement('div');
     titleDiv.appendChild(document.createTextNode("title:"));
@@ -1709,12 +1767,62 @@ function createFilmHtml(title,description,release_year,language,length,rating,di
     release_year_area.value = release_year;
     release_year_div.appendChild(release_year_area);
 
-    let languagediv = document.createElement('div');
-    languagediv.appendChild(document.createTextNode("language:"));
-    let languagedivarea = document.createElement('textarea');
-    languagediv.className = "language";
-    languagedivarea.value = language;
-    languagediv.appendChild(languagedivarea);
+    let languagename = document.createElement('div');
+    languagename.appendChild(document.createTextNode("language:"));
+    languagename.className = "language";
+    
+    let languageTitle = document.createElement('button');
+    waitToGetFilms('getLanguages',"takeLanguages").then(languages=>{
+                    
+        let languagesDiv = document.createElement('div');
+        languageTitle.appendChild(document.createTextNode(language));
+        languageTitle.style.border = "1px white solid";
+        languagesDiv.className = 'languageChoose'
+        languagesDiv.appendChild(languageTitle);
+        let languageContent = document.createElement('div');
+        languagesDiv.appendChild(languageContent);
+        languageContent.className = 'languageContent';
+
+        movieInfo.appendChild(languagesDiv);
+
+        for(let language of languages) {
+            let button = document.createElement('button');
+            button.appendChild(document.createTextNode(language.name));
+            languageContent.appendChild(button);
+            button.addEventListener('focus', () =>{
+                languageTitle.innerHTML = button.innerHTML;
+            });
+        }
+
+    });
+
+    let categoryTitle = document.createElement('button');
+    let categoryname = document.createElement('div');
+    categoryname.appendChild(document.createTextNode("category:"));
+    categoryname.className = "categoryname";
+    waitToGetFilms('getCategories',"takeCategories").then(categories=>{
+        
+        let categoryDiv = document.createElement('div');
+        categoryTitle.appendChild(document.createTextNode(category));
+        categoryTitle.style.border = "1px white solid";
+        categoryDiv.className = 'categoryChoose'
+        categoryDiv.appendChild(categoryTitle);
+        let categoryContent = document.createElement('div');
+        categoryDiv.appendChild(categoryContent);
+        categoryContent.className = 'languageContent';
+
+        movieInfo.appendChild(categoryDiv);
+
+        for(let category of categories) {
+            let button = document.createElement('button');
+            button.appendChild(document.createTextNode(category.name));
+            categoryContent.appendChild(button);
+            button.addEventListener('focus', () =>{
+                categoryTitle.innerHTML = button.innerHTML;
+            });
+        }
+
+    });
 
     let lengthdiv = document.createElement('div');
     lengthdiv.appendChild(document.createTextNode("length:"));
@@ -1724,20 +1832,38 @@ function createFilmHtml(title,description,release_year,language,length,rating,di
     lengthdiv.appendChild(lengthdivarea);
 
 
-    let ratingdiv = document.createElement('div');
-    ratingdiv.appendChild(document.createTextNode("rating:"));
-    let ratingdivarea = document.createElement('textarea');
-    ratingdiv.className = "rating"
-    ratingdivarea.value = rating;
-    ratingdiv.appendChild(ratingdivarea);
+    let ratingname = document.createElement('div');
+    ratingname.appendChild(document.createTextNode("rating:"));
+    ratingname.className = "rating"
+    let ratingTitle = document.createElement('button');
+    let ratingDiv = document.createElement('div');
+    ratingTitle.appendChild(document.createTextNode(rating));
+    ratingTitle.style.border = "1px white solid";
+    ratingDiv.className = 'ratingChoose'
+    ratingDiv.appendChild(ratingTitle);
+    let ratingContent = document.createElement('div');
+    ratingDiv.appendChild(ratingContent);
+    ratingContent.className = 'languageContent';
+
+    movieInfo.appendChild(ratingDiv);    
+
+    for(let rating of ["G",'PG','PG-13','R','NC-17']){
+        let button = document.createElement('button');
+        button.appendChild(document.createTextNode(rating));
+        ratingContent.appendChild(button);
+        button.addEventListener('focus', () =>{
+            ratingTitle.innerHTML = button.innerHTML;
+        });
+    }
+    
 
     movieInfo.appendChild(release_year_div);
     movieInfo.appendChild(descriptionDiv);
     movieInfo.appendChild(titleDiv);
-    movieInfo.appendChild(ratingdiv);
+    movieInfo.appendChild(categoryname);
     movieInfo.appendChild(lengthdiv);
-    movieInfo.appendChild(languagediv);
-
+    movieInfo.appendChild(languagename);
+    movieInfo.appendChild(ratingname);
     let close = document.createElement("button");
     let closetxt = document.createTextNode('x');
 
@@ -1764,18 +1890,20 @@ function createFilmHtml(title,description,release_year,language,length,rating,di
     save.addEventListener("click",()=>{
 
         if(titleArea.value != "" && descriptionArea.value != "" 
-        && release_year_area.value!="" && languagedivarea.value !="" 
-        && lengthdivarea.value!="" && ratingdivarea.value!=""){
+        && release_year_area.value!="" && languageTitle.innerHTML != "Choose language" 
+        && lengthdivarea.value!="" && ratingTitle.innerHTML!="Choose rating" && categoryTitle.innerHTML!="Choose category"){
             movieInfo.style.display = "none";
             socket.emit(socketmessage,
                 {
                     title: titleArea.value,
                     description: descriptionArea.value,
                     release_year: release_year_area.value,
-                    language: languagedivarea.value,
+                    language: languageTitle.innerHTML,
                     length: lengthdivarea.value,
-                    rating: ratingdivarea.value
-                }
+                    rating: ratingTitle.innerHTML,
+                    category: categoryTitle.innerHTML,
+                    id:film_id
+                } 
             );
         }
         
@@ -1811,4 +1939,121 @@ function createOneRowDivs(title,contentDiv,messageTosocket,divid){
             socket.emit(messageTosocket,divid)
         })
     })
+}
+
+function createAddress(contentDiv,addresses){
+    let row = document.createElement("div");
+    row.className = "row_address";
+
+    let addressDiv = document.createElement("div");
+    addressDiv.appendChild(document.createTextNode("ADDRESS"));
+
+    let districtDiv = document.createElement("div");
+    districtDiv.appendChild(document.createTextNode("DISTRICT"));
+
+    let cityDiv = document.createElement("div");
+    cityDiv.appendChild(document.createTextNode("CITY"));
+
+    let postalCodeDiv = document.createElement("div");
+    postalCodeDiv.appendChild(document.createTextNode("POSTAL CODE"));
+
+    let phoneDiv = document.createElement("div");
+    phoneDiv.appendChild(document.createTextNode("PHONE"));
+
+    row.appendChild(addressDiv);
+    row.appendChild(districtDiv);
+    row.appendChild(cityDiv);
+    row.appendChild(postalCodeDiv);
+    row.appendChild(phoneDiv);
+
+    let addAddress = document.createElement("button");
+    addAddress.id = "add-content";
+    addAddress.appendChild(document.createTextNode("add address"));
+    contentDiv.appendChild(addAddress);
+    
+    addAddress.addEventListener("click",()=>{
+        document.querySelector('.address-content').style.display = "block";
+        let cityChoice = document.getElementById('city_chose');
+        waitToGetFilms('getCities','cities').then(cities=>{
+            for(let city of cities){
+                waitForButton(city).then(button=>{
+                    waitClick(button).then(html=>{
+                        cityChoice.innerHTML = html;
+                    })
+                });
+
+            }
+            document.querySelector('.address-content .save').addEventListener('click',()=>{
+
+                if(document.querySelector('.address-content #addressArea').value !='' && document.querySelector('.address-content #districtArea').value != '' && cityChoice.innerHTML !='Choose city' && document.querySelector('.address-content #postalcodeArea').value != ''  && document.querySelector('.address-content #phoneArea').value != ''){
+                    socket.emit('new address',[document.querySelector('.address-content #addressArea').value,document.querySelector('.address-content #districtArea').value,cityChoice.innerHTML,document.querySelector('.address-content #postalcodeArea').value, document.querySelector('.address-content #phoneArea').value]);
+                }
+            });
+
+            document.querySelector('.address-content .close').addEventListener('click',()=>{
+                document.querySelector('.address-content').style.display = "none";
+            });
+        });
+        
+    });
+
+    contentDiv.appendChild(row);
+    for(let address of addresses){
+        let addressClone = addressDiv.cloneNode();
+        addressClone.appendChild(document.createTextNode(address.address));
+
+        let districtClone = districtDiv.cloneNode();
+        districtClone.appendChild(document.createTextNode(address.district));
+
+        let cityClone = cityDiv.cloneNode();
+        cityClone.appendChild(document.createTextNode(address.city));
+
+        let postalCodeClone = postalCodeDiv.cloneNode();
+        postalCodeClone.appendChild(document.createTextNode(address.postal_code));
+
+        let phoneClone = phoneDiv.cloneNode();
+        phoneClone.appendChild(document.createTextNode(address.phone))
+
+
+        let deleteButton = document.createElement('button');
+        deleteButton.appendChild(document.createTextNode('delete'));
+
+
+        addressDiv.appendChild(addressClone);
+        districtDiv.appendChild(districtClone);
+        cityDiv.appendChild(cityClone);
+        postalCodeDiv.appendChild(postalCodeClone);
+        phoneDiv.appendChild(phoneClone);
+        phoneDiv.appendChild(deleteButton);
+
+        deleteButton.addEventListener('click',()=>{
+            socket.emit('delete address',address.address_id);
+        });
+
+    }
+    
+}
+
+
+function waitForButton(city){
+    return new Promise((resolve, reject) =>{
+        let button = document.createElement('button');
+        let text = document.createTextNode(city.city)
+        button.appendChild(text)
+        document.querySelector('.city_content').appendChild(button);
+        resolve(button);
+    })
+}
+
+
+function waitClick(button){
+
+    return new Promise((resolve, reject) => {
+        button.addEventListener('mousedown',()=>{
+                        
+            resolve(button.innerHTML);
+     
+         });
+    })
+   
 }
