@@ -55,7 +55,15 @@ io.on('connection', socket =>{
             });
         }
         else if(credentialInfo[0] == 'admin'){
+            authenticate_admin(credentialInfo).then(results =>{
+                socket.emit('handshake',results)
 
+                getCustomers().then(result=>{
+                    socket.emit('getCustomersAdmin',result);
+                });
+            }).catch(()=>{
+                socket.emit('handshake','Wrong');
+            })
         }
         else{
             authenticate_employee(credentialInfo).then(result=>{
@@ -205,13 +213,20 @@ io.on('connection', socket =>{
     });
 
     socket.on('new film',data=>{
-        insertNewFilm(data.title,data.description,data.release_year,data.language,data.length,data.rating).then(()=>{
-            socket.emit('deleted film',"");
-        })
+        insertNewFilm('film',data.title,data.description,data.release_year,data.language,data.length,data.rating).then(()=>{
+            insertFilmCategory("film_category",'film_id',"film",data.title,data.category);
+            
+            socket.emit('film deleted',"");
+            
+        });
     });
 
     socket.on('modify film',data=>{
-        console.log(data)
+        console.log(data);
+        modifyFilm(data.title,data.description,data.release_year,data.language,data.length,data.rating,data.id).then(()=>{
+            updateCategory('film_category','film_id',data.category,data.id);
+            socket.emit('film deleted',"");
+        })
     })
 
     socket.on('delete series',data=>{
@@ -221,11 +236,18 @@ io.on('connection', socket =>{
     });
 
     socket.on('new series',data=>{
-        console.log(data);
+        insertNewSeries('series',data.title,data.description,data.release_year,data.language,data.rating).then(()=>{
+            insertFilmCategory("serie_category",'serie_id',"series",data.title,data.category);
+            socket.emit('series deleted',"");
+            
+        });
     });
 
     socket.on('modify series',data=>{
-        console.log(data)
+        modifySeries(data.title,data.description,data.release_year,data.language,data.rating,data.id).then(()=>{
+            updateCategory('serie_category','serie_id',data.category,data.id);
+            socket.emit('series deleted',"");
+        })
     })
 
     socket.on('getLanguages',data=>{
@@ -246,11 +268,7 @@ io.on('connection', socket =>{
         })
     });
 
-    socket.on('delete category',data=>{
-        deleteFromTable("category","category.category_id",data).then(()=>{
-            socket.emit('deleted category',"");
-        })
-    })
+    
 
     socket.on('new language',data=>{
         insertOneValue('language','name', data).then(()=>{
@@ -312,6 +330,60 @@ io.on('connection', socket =>{
             socket.emit('deleted address',"");
         })
     })
+
+    socket.on('getMostRent',data=>{
+        let date = new Date();
+        let dateToSearch = new Date()
+        let dd = String(date.getDate()).padStart(2, '0');
+        let mm = String(date.getMonth() + 1).padStart(2, '0');
+        let yyyy = date.getFullYear();
+        date =  yyyy + '-' + mm  + '-' + dd ;
+
+        let mmChanged = String(dateToSearch.getMonth()).padStart(2, '0');
+        if(mmChanged == 0) mmChanged = 11;
+        dateToSearch =  yyyy + '-' + mmChanged  + '-' + dd ;
+
+       getMostRent('m',date,dateToSearch).then(movies =>{
+           getMostRent('s',date,dateToSearch).then(series =>{
+               socket.emit('takeMostRent',{films:movies,series:series});
+           });
+       })
+    });
+
+
+    socket.on('deleteCustomer',data=>{ //got email
+        data = dataParser(data,",");
+
+        deleteFromTable('customer',"customer_id",data[1]).then(data =>{
+            socket.emit('customer deleted',"");
+        })
+
+    });
+
+    socket.on('getEmployees',data=>{
+        getFromTable('employees').then(results =>{
+            socket.emit('takeEmployees',results);
+        })
+    });
+
+    socket.on('deleteEmployee',data=>{    //got email
+       data = dataParser(data,",");
+
+       deleteFromTable('employees','employees_id',data[1]).then(data =>{
+           socket.emit('employee deleted',"");
+       });
+    });
+
+
+    socket.on("changeToAdmin",data=>{
+        let datap = dataParser(data,",");
+        
+        insertIntoAdmin(datap[1]).then(res =>{
+            deleteFromTable('employees','employees_id',datap[1]).then()
+            socket.emit('employee deleted',"");
+            
+        });
+    });
 });
 
 
@@ -328,7 +400,7 @@ function authenticate_user(statement){
 
     return new Promise((resolve, reject)=>{
 
-        let query = "Select customer_id ,choice from customer where (first_name = ? and last_name = ? and email = ?)"
+        let query = "Select customer_id ,choice,email from customer where (first_name = ? and last_name = ? and email = ?)"
         connection.query(query,[statement[1],statement[2],statement[3]],(err, results)=>{
             if (err) throw err;
 
@@ -347,7 +419,25 @@ function authenticate_employee(statement){
 
     return new Promise((resolve, reject)=>{
 
-        let query = "Select employees_id as customer_id from employees where (first_name = ? and last_name = ? and email = ?)"
+        let query = "Select employees_id as customer_id,email from employees where (first_name = ? and last_name = ? and email = ?)"
+        connection.query(query,[statement[1],statement[2],statement[3]],(err, results)=>{
+            if (err) throw err;
+
+            else {
+                if(results.length === 0) reject();
+
+                else{
+                    resolve(JSON.parse(JSON.stringify(results[0])));
+                }
+            }
+        });
+    });
+}
+
+function authenticate_admin(statement){
+    return new Promise((resolve, reject)=>{
+
+        let query = "Select admin_id as customer_id,email from administrator where (first_name = ? and last_name = ? and email = ?)"
         connection.query(query,[statement[1],statement[2],statement[3]],(err, results)=>{
             if (err) throw err;
 
@@ -378,13 +468,13 @@ function getFilms(tableName){
 
     return new Promise((resolve, reject)=>{
 
-        let query = "SELECT film_id,title, description, release_year,language.name as language , length, rating, category.name as category FROM film inner join language on film.language_id = language.language_id inner join film_category on film_category.film_id = film.film_id inner join category on category.category_id = film_category.category_id ORDER BY title asc;"
+        let query = "SELECT film.film_id,title, description, release_year,language.name as language , length, rating, category.name as category FROM film inner join language on film.language_id = language.language_id inner join film_category on film_category.film_id = film.film_id inner join category on category.category_id = film_category.category_id ORDER BY title asc;"
 
         connection.query(query,(err, results) =>{
             if(err) throw err;
 
             else{
-                console.log(results);
+                
                resolve(JSON.parse(JSON.stringify(results)));
             }
         })
@@ -788,9 +878,9 @@ function insertIntoAddress(array){
     });
 }
 
-function insertNewFilm(title,description,release_year,language,length,rating){
+function insertNewFilm(tablename,title,description,release_year,language,length,rating){
 
-    let query = "Insert into film(title, description, release_year, language_id,length,rating) " +
+    let query = "Insert into " +tablename +"(title, description, release_year, language_id,length,rating) " +
     "values(?,?,?,(select language.language_id from language where language.name = ?),?,?)";
 
     return new Promise((resolve, reject) => {
@@ -798,5 +888,106 @@ function insertNewFilm(title,description,release_year,language,length,rating){
             if(err) throw err;
             resolve(results);
         });
+
     });
+}
+
+function insertFilmCategory(tablename,idname,tableToSelect,title,category){
+    let query = "Insert into " + tablename + " values((select " + idname +" from "+ tableToSelect+ " where title = ? ),(select category_id from category where category.name = ?));"
+
+    return new Promise((resolve, reject) => {
+        connection.query(query,[title,category],(err, results)=>{
+            if(err) throw err;
+            resolve(results);
+        });
+    });
+}
+
+
+function insertNewSeries(tablename,title,description,release_year,language,rating){
+
+    let query = "Insert into " +tablename +"(title, description, release_year, language_id,rating) " +
+    "values(?,?,?,(select language.language_id from language where language.name = ?),?)";
+
+    return new Promise((resolve, reject) => {
+        connection.query(query,[title,description,release_year,language,rating],(err, results)=>{
+            if(err) throw err;
+            resolve(results);
+        });
+
+    });
+}
+
+function modifyFilm(title,description,release_year,language,length,rating,film_id){
+
+    let query = "update film set title = ? , description = ? , release_year = ? , "+
+    "language_id = (select language_id from language where language.name =?),length = ? , rating =? where film_id = ?";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[title,description,release_year,language,length,rating,film_id],(err, res) => {
+            if(err) throw err;
+
+            else resolve(res);
+        });
+    });
+}
+
+
+function updateCategory(categoryname,idname,category,id){
+    let query = "update " + categoryname + " set category_id = (select category_id from category where category.name = ?)" +
+    " where " + idname + " = ?" ;
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[category,id],(err, res) => {
+            if(err) throw err;
+
+            else resolve(res);
+        });
+    });
+}
+
+function modifySeries(title,description,release_year,language,rating,film_id){
+    let query = "update film set title = ? , description = ? , release_year = ? , "+
+    "language_id = (select language_id from language where language.name =?), rating =? where film_id = ?";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[title,description,release_year,language,rating,film_id],(err, res) => {
+            if(err) throw err;
+
+            else resolve(res);
+        });
+    });
+}
+
+
+function getMostRent(type,lastdate,firstdate){
+    let query = "call most_rent(?,5,?,?);";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[type,firstdate,lastdate],(err, res) => {
+            if(err) throw err;
+
+            else resolve(JSON.parse(JSON.stringify(res[0])));
+        });
+    });
+}
+
+
+function insertIntoAdmin(employees_id){
+
+    let query = "INSERT INTO administrator(first_name,last_name,email) select first_name,last_name,email from employees where employees_id =?";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[employees_id],(err, res) => {
+            if(err) throw err;
+
+            else resolve();
+        });
+    });
+
 }

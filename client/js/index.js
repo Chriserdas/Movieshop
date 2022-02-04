@@ -25,7 +25,7 @@ let xAttribute = "M5.72 5.72a.75.75 0 011.06 0L12 10.94l5.22-5.22a.75.75 0 111.0
 
 
 let user = document.querySelector("#login");
-
+let mail;
 let tagname = "customer";
 let id;
 let customer_choice;
@@ -48,9 +48,13 @@ let divClicked = films;
 let customers_employee = document.querySelector(".customers_button");
 let rental_employee = document.querySelector(".rental_button");
 let info_employee = document.querySelector(".info_button");
-let most_viewed_employee = document.querySelector(".most-viewed-employee");
+let most_viewed_employee = document.querySelector(".most-viewed-button");
 let employeedivClicked = customers_employee;
 
+let customers_admin = document.querySelector(".admin .customers_button");
+let employees_button = document.querySelector(".admin .rental_button");
+let admins = document.querySelector(".admin .info_button");
+let adminClicked = customers_admin;
 
 close.addEventListener('click', ()=>{
     ipcRenderer.send("close_app",'close_app')
@@ -78,11 +82,18 @@ admin_button.addEventListener('click',(e)=>{
 
     if(tagname == "customer"){
         document.querySelector('.customer').style.display = "block";
-        document.querySelector('.employee').style.display = "none"
+        document.querySelector('.employee').style.display = "none";
+        document.querySelector('.admin').style.display = "none";
     }
     else if(tagname == "employee"){
         document.querySelector('.customer').style.display = "none";
-        document.querySelector('.employee').style.display = "block"
+        document.querySelector('.employee').style.display = "block";
+        document.querySelector('.admin').style.display = "none";
+    }
+    else if(tagname == "admin") {
+        document.querySelector('.customer').style.display = "none";
+        document.querySelector('.employee').style.display = "none";
+        document.querySelector('.admin').style.display = "block";
     }
 });
 
@@ -99,11 +110,18 @@ employee_button.addEventListener('click',(e)=>{
     
     if(tagname == "customer"){
         document.querySelector('.customer').style.display = "block";
-        document.querySelector('.employee').style.display = "none"
+        document.querySelector('.employee').style.display = "none";
+        document.querySelector('.admin').style.display = "none";
     }
     else if(tagname == "employee"){
         document.querySelector('.customer').style.display = "none";
-        document.querySelector('.employee').style.display = "block"
+        document.querySelector('.employee').style.display = "block";
+        document.querySelector('.admin').style.display = "none";
+    }
+    else if(tagname == "admin") {
+        document.querySelector('.customer').style.display = "none";
+        document.querySelector('.employee').style.display = "none";
+        document.querySelector('.admin').style.display = "block";
     }
 
 });
@@ -241,6 +259,118 @@ info_employee.addEventListener('click',()=>{
     createInfo();
 });
 
+most_viewed_employee.addEventListener('click',()=>{
+    document.querySelector('.address-content').style.display = "none";
+    most_viewed_employee.style.backgroundColor = "#4d30d5";
+    
+    if(employeedivClicked != most_viewed_employee) employeedivClicked.style.backgroundColor = "";
+    
+    employeedivClicked = most_viewed_employee;
+
+    document.querySelector('.content-employee').innerHTML = "";
+    document.querySelector('.employee-accountDiv').style.display = "none";
+    document.querySelector('.rental_content').style.display = "none";
+    document.querySelector('.employee .movieInfo').style.display = "none";
+
+    waitToGetFilms('getMostRent','takeMostRent').then(mostRent=>{
+
+        for(let film of mostRent.films){
+            createFilms(film,'films',document.querySelector('.content-employee'),mostRent.films);
+        }
+        for(let film of mostRent.series){
+            createFilms(film,'films',document.querySelector('.content-employee'),mostRent.series);
+        }
+        
+    })
+});
+
+
+customers_admin.addEventListener('click',()=>{
+
+    let adminContent = document.querySelector('.admin-content');
+    document.querySelector('.admin .accountDiv').style.display = "none";
+    customers_admin.style.backgroundColor = "#4d30d5";
+    
+    if(adminClicked != customers_admin) adminClicked.style.backgroundColor = "";
+
+    adminClicked = customers_admin;
+
+    waitToGetFilms('getCustomers','takeCustomers').then(customers=>{
+        adminContent.innerHTML ="";
+        startCount =2;
+            
+        for(let customer of customers){
+            
+            let customerButton = createCustomersAdmin(customer);
+            customerButton.style.animation = "none";
+            customerButton.style.opacity = '1';
+            customerButton.addEventListener('click', () =>{
+                let deleteCustomer = document.createElement('button');
+                deleteCustomer.className = "deleteDiv";
+                deleteCustomer.style.top = "5%";
+                deleteCustomer.appendChild(document.createTextNode("delete"));
+                adminContent.appendChild(deleteCustomer);
+
+                deleteCustomer.addEventListener('click', () =>{
+                    socket.emit("deleteCustomer",mail + "," + customer.customer_id);
+                });
+            });
+        }
+        addCustomer(adminContent);
+        socket.on('customer deleted',data=>{
+            customers_admin.click();
+        })
+    });
+});
+
+employees_button.addEventListener('click', () =>{
+
+    let adminContent = document.querySelector('.admin-content');
+    adminContent.innerHTML ="";
+    document.querySelector('.admin .accountDiv').style.display = "none";
+
+    employees_button.style.backgroundColor = "#4d30d5";
+    
+    if(adminClicked != employees_button) adminClicked.style.backgroundColor = "";
+
+    adminClicked = employees_button;
+
+    waitToGetFilms('getEmployees','takeEmployees').then(employees =>{
+        adminContent.innerHTML ="";
+        for(let employee of employees){
+            
+            let customerButton = createCustomersAdmin(employee);
+            customerButton.style.animation = "none";
+            customerButton.style.opacity = '1';
+            customerButton.addEventListener('click', () =>{
+                let deleteCustomer = document.createElement('button');
+                deleteCustomer.className = "deleteDiv";
+                deleteCustomer.style.top = "5%";
+                deleteCustomer.appendChild(document.createTextNode("delete"));
+                adminContent.appendChild(deleteCustomer);
+                let changeToAdmin = document.createElement('button');
+                changeToAdmin.appendChild(document.createTextNode("change to administrator"));
+
+                changeToAdmin.className = "changeToAdmin";
+                adminContent.appendChild(changeToAdmin);
+                deleteCustomer.addEventListener('click', () =>{
+                    socket.emit("deleteEmployee",mail + "," + employee.employees_id);
+                });
+
+                changeToAdmin.addEventListener('click', () =>{
+                    
+                    socket.emit("changeToAdmin",mail + "," + employee.employees_id);
+                })
+            });
+        }
+        addEmployee(adminContent,'employee');
+        socket.on('employee deleted',data=>{
+            employees_button.click();
+        })
+    });
+    
+})
+
 
 signin.addEventListener('click',(e)=>{
     
@@ -266,6 +396,37 @@ signin.addEventListener('click',(e)=>{
             document.querySelector('.customers_button').style.backgroundColor = "#4d30d5"
             createCustomers(customers);
         });
+
+        socket.on('getCustomersAdmin', customers =>{
+            customers_admin.style.backgroundColor = "#4d30d5";
+            
+            let adminContent = document.querySelector('.admin-content');
+            
+            document.querySelector('.admin-content').innerHTML = "";
+        
+            ++startCount;
+                
+            for(let customer of customers){
+                
+                let customerButton = createCustomersAdmin(customer);
+
+                customerButton.addEventListener('click', () =>{
+                    let deleteCustomer = document.createElement('button');
+                    deleteCustomer.className = "deleteDiv";
+                    deleteCustomer.style.top = "5%";
+                    deleteCustomer.appendChild(document.createTextNode("delete"));
+                    adminContent.appendChild(deleteCustomer);
+
+                    deleteCustomer.addEventListener('click', () =>{
+                        socket.emit("deleteCustomer",mail + "," + customer.customer_id);
+                    });
+                });
+            }
+            addCustomer(adminContent);
+            socket.on('customer deleted',data=>{
+                customers_admin.click();
+            })
+        })
     }
 });
 
@@ -335,6 +496,7 @@ function quitLogin(socket){
             else{
                 checkCredentials(true);
                 id = data.customer_id;
+                mail = data.email;
                 customer_choice = data.choice;
                 
                 setTimeout(()=>{
@@ -1316,7 +1478,7 @@ function createInfo() {
         
         
         waitToGetFilms('getFilms','getFilms').then(films=>{
-            console.log(films);
+            contentDiv.innerHTML = "";
             let addmovieButton = document.createElement("button");
             let addmovietxt = document.createTextNode("add film");
             addmovieButton.appendChild(addmovietxt);
@@ -1373,6 +1535,7 @@ function createInfo() {
         clicked.style.letterSpacing = "3.1px";
         
         waitToGetFilms('getSeries',"takeSeries").then(series=>{
+            contentDiv.innerHTML = "";
             let addmovieButton = document.createElement("button");
             let addmovietxt = document.createTextNode("add series");
             addmovieButton.appendChild(addmovietxt);
@@ -1692,8 +1855,7 @@ function createInfo() {
                 addressButton.click();
             });
         })
-    });
-            
+    });            
 }
 
 
@@ -2056,4 +2218,93 @@ function waitClick(button){
          });
     })
    
+}
+
+function createCustomersAdmin(customer){
+    let button = document.createElement("button");
+    let img = document.createElement("img");
+    if(startCount === 1) {
+        button.style.animation = "showContent 0.5s 6100ms forwards"
+    }
+
+    else {
+        button.style.opacity = "1"
+    };
+
+    img.setAttribute("src", "../icons/account.png");
+    img.setAttribute("width", "200px");
+    img.setAttribute('height', "250px");
+
+    
+    let title = document.createTextNode(customer.first_name + " " + customer.last_name);
+    let year = document.createTextNode(customer.email);
+
+    let imgDiv = document.createElement("div");
+    let titleDiv = document.createElement("div");
+    let yearDiv = document.createElement("div");
+
+    
+    imgDiv.className = "imgDiv";
+    titleDiv.className = "title";
+    yearDiv.className = "year";
+    button.className = "movieDiv"
+
+    titleDiv.appendChild(title);
+    yearDiv.appendChild(year);
+    imgDiv.appendChild(img);
+
+    button.appendChild(titleDiv);
+    button.appendChild(yearDiv);
+    button.appendChild(imgDiv);
+    
+    document.querySelector('.admin-content').appendChild(button);
+
+    return button;
+}
+
+function addCustomer(adminContent){
+    let addCustomer = document.createElement('button');
+    addButton = addCustomer.appendChild(document.createTextNode("create customer"));
+    addCustomer.id = 'add-content'; 
+
+    adminContent.appendChild(addCustomer);
+
+    addCustomer.addEventListener('click', ()=>{
+        createAccountInfo(
+            {
+                first_name:"",
+                last_name:"",
+                choice:"FS",
+                email:"",
+                city:"",
+                country:"",
+                postal_code:"",
+                phone:"",
+                address:"",
+                district:"",
+                create_date:new Date(),
+            }
+        ,'.admin .accountDiv');
+
+        document.querySelector('.admin .accountDiv .close').addEventListener('click',()=>{
+            document.querySelector('.admin .accountDiv').style.display = "none";
+        });
+    });
+}
+
+function addEmployee(adminContent,createName){
+    let addCustomer = document.createElement('button');
+    addButton = addCustomer.appendChild(document.createTextNode("create " + createName));
+    addCustomer.id = 'add-content'; 
+
+    adminContent.appendChild(addCustomer);
+
+    addCustomer.addEventListener('click',()=>{
+        document.querySelector('.admin .addAdmin').style.display = 'block';
+        document.querySelector('.admin .addAdmin').style.animation = 'showAdmin 500ms cubic-bezier(0.34, 1.21, 0.74, 1.4) forwards';
+
+        document.querySelector('.addAdmin .close').addEventListener('click',()=>{
+            
+        });
+    });
 }

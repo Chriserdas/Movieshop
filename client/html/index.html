@@ -316,6 +316,111 @@
         </div>
         
     </div>
+
+    <div class = "admin">
+        <div class = "employee-menu">
+            <button class = "customers_button">Customers</button>
+            <button class = "rental_button">Employees</button>
+            <button class = "info_button">Admins</button>
+            <!--<button class = "most-viewed-button">most viewed</button>-->
+        </div>
+
+        <div class = "admin-content">
+            
+        </div>
+
+        <div class ="accountDiv">
+            <div id ="account_title">Customer INFO</div>
+            <div class="firstname">
+                <div id ="firstname">First Name:</div>
+                <textarea  id="firstnameArea" maxlength="45"  ></textarea>
+            </div>
+            <div class="lastname">
+                <div id ="lastname">Last Name:</div>
+                <textarea  id="lastnameArea" maxlength="45"></textarea>
+            </div>
+            <div class="email">
+                <div id ="email">Email:</div>
+                <textarea  id="emailtxt" maxlength="45"></textarea>
+            </div>
+            <div class="createDate">
+                <div id ="createDate">Date of creation:</div>
+                <div  id="datetxt"></div>
+            </div>
+
+            <div class="choice">
+                <div id="choice_title">Available content:</div>
+                <div id ="choice">
+                    <button id ="chosen"></button>
+                    <button id ="down-button" >></button>
+                </div>
+                
+                <div class="choice-content">
+                    <button id = "choice1"></button>
+                    <button id = "choice2"></button>
+                </div>
+            </div>
+
+            <div class="address">
+                <div id ="address">Address:</div>
+                <textarea  id="addressArea" maxlength="50"></textarea>
+            </div>
+
+            <div class="city">
+                <div id ="city">City:</div>
+                <div id ="city-choosed">
+                    <button id ="city_chosen"></button>
+                    <button id = "down-button">></button>
+                </div>
+                <div class="city-content">
+                
+                </div>
+            </div>
+
+            <div class="country">
+                <div id ="country_title">Country:</div>
+                <div  id="countryname"></div>
+            </div>
+
+            <div class="district">
+                <div id ="district">District:</div>
+                <textarea  id="districtArea" maxlength="20"></textarea>
+            </div>
+
+            <div class="postalcode">
+                <div id ="postalcode">Postal code:</div>
+                <textarea  id="postalcodeArea" maxlength="10"></textarea>
+            </div>
+
+            <div class="phone">
+                <div id ="phone">Phone:</div>
+                <textarea  id="phoneArea" maxlength="20"></textarea>
+            </div>
+            <button class = "save">Save</button>
+            <button class = "close">x</button>
+        </div>
+
+        <div class = "addAdmin">
+            
+            <div class="firstname">
+                <div id ="firstname">First Name:</div>
+                <textarea  id="firstnameArea" maxlength="45"  ></textarea>
+            </div>
+            <div class="lastname">
+                <div id ="lastname">Last Name:</div>
+                <textarea  id="lastnameArea" maxlength="45"></textarea>
+            </div>
+            <div class="email">
+                <div id ="email">Email:</div>
+                <textarea  id="emailtxt" maxlength="45"></textarea>
+            </div>
+            
+            <button class = "save">Save</button>
+            <button class = "close">x</button>
+        </div>
+        
+    </div>
+
 </body>
 <script src="http://localhost:5000/socket.io/socket.io.js"></script>
 <script src="../js/index.js"></script>

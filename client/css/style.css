@@ -2061,8 +2061,8 @@ body {
 
 .deleteDiv{
     position:absolute;
-    top:60%;
-    left:85%;
+    top:35%;
+    left:92%;
     font-family:Oswald;
     font-size:20px;
     font-weight:bold;
@@ -2330,7 +2330,7 @@ body {
 .city-address{
     position:relative;
     top:35px;
-     color:#71DFBE;
+    color:#71DFBE;
     left:20%;
     font-family:Oswald;
     letter-spacing:1.1px;
@@ -2388,13 +2388,13 @@ body {
     position:absolute;
     top:35px;
     left:49px;
-   height:300px;
-   overflow-y:auto;
-   overflow-x:hidden;
-   width:300px;
-   opacity:0;
- transform:translateY(-10px);
- transition:150ms ease-in;
+    height:300px;
+    overflow-y:auto;
+    overflow-x:hidden;
+    width:300px;
+    opacity:0;
+    transform:translateY(-10px);
+    transition:150ms ease-in;
     background-color:#1a263a;
     pointer-events:none;
 }
@@ -2594,4 +2594,99 @@ body {
     opacity:1;
     transform:translateY(0);
     pointer-events:auto;
+}
+
+.admin{
+    position: absolute;
+    top:45px;
+    height:calc(100vh - 45px);
+    width:100%;
+    background-color: #192231;
+    display:none;
+}
+
+.admin-content{
+    position:fixed;
+    top:45px;
+    opacity:0;
+    left:130px;
+    background-color:#192231;
+    width:calc(100vw - 130px);
+    height:calc(100vh - 45px);
+    box-shadow:0px 1px 2px black;
+    overflow-y:auto;
+    overflow-x:clip;
+    animation: showContent 0.5s 6100ms forwards;
+}
+
+#emailtxt{
+    resize:none;
+    outline:none;
+    border:none;
+    font-size:17px;
+    font-family:Oswald;
+}
+
+.changeToAdmin{
+    position:absolute;
+    left:75%;
+    top:5%;
+    color:#ce8b28;
+    text-transform:uppercase;
+    border:2px #ce8b28 solid;
+    background-color:transparent;
+    padding:10px;
+    font-family:Oswald;
+    letter-spacing:1.1px;
+    font-size:15px;
+    padding-left:10px;
+    padding-right:10px;
+    font-weight:bold;
+    transition:.5s ease-in;
+}
+
+.changeToAdmin:hover{
+    background-color:#ce8b28;
+    color:white;
+    cursor:pointer;
+}
+
+.addAdmin{
+    position:fixed;
+    left:130px;
+    width:calc(100vw - 130px);
+    top:-480px;
+    height:27%;
+    background-color:#151C28;
+    display: none;
+    /*animation:showAdmin 500ms cubic-bezier(0.34, 1.21, 0.74, 1.4) forwards;*/
+}
+
+.addAdmin .firstname{
+    left:10%;
+}
+
+.addAdmin .lastname{
+    left:20%;
+}
+
+.addAdmin .email{
+    left:30%;
+}
+
+.addAdmin .save{
+    top:65%;
+}
+
+.addAdmin .close{
+    top:5%;
+}
+
+@keyframes showAdmin{
+    from{
+        top:880px;
+    }
+    to{
+        top:500px;
+    }
 }

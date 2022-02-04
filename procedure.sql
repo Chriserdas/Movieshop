@@ -5,7 +5,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `most_rent`(IN lt CHAR(1), IN number
 BEGIN
 IF(lt like 'm') THEN 
 
-SELECT film.title, film.film_id 
+SELECT film.title, film.film_id,film.release_year 
 FROM film 
 INNER JOIN film_rental ON film_rental.film_id = film.film_id
 WHERE film_rental.film_rental_date BETWEEN imerominia1 AND imerominia2
@@ -13,12 +13,12 @@ GROUP BY film_id
 ORDER BY count(*) DESC 
 LIMIT number;
 ELSEIF(lt like 's') THEN 
-SELECT serie.title, serie.serie_id, count(*) 
-FROM serie INNER JOIN seasons ON serie.serie_id = season.serie_id
-INNER JOIN episodes ON episodes.season_id = season.season_id
+SELECT series.title, series.serie_id,series.release_year,count(*) 
+FROM series INNER JOIN seasons ON series.serie_id = seasons.serie_id
+INNER JOIN episodes ON episodes.season_id = seasons.season_id
 INNER JOIN episode_rental ON episode_rental.episode_id= episodes.episode_id
 WHERE episode_rental.episode_rental_date BETWEEN imerominia1 AND imerominia2
-GROUP BY serie.serie_id
+GROUP BY series.serie_id
 ORDER BY count(*) DESC 
 LIMIT number;
 ELSE
