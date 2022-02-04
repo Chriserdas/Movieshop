@@ -1,4 +1,13 @@
 ------------FILMS/SERIES-----------------
+drop table if exists language;
+CREATE TABLE language (
+    language_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    name CHAR(20) NOT NULL,
+    PRIMARY KEY (language_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+
+
 drop table if exists film;
   CREATE TABLE film (
     film_id SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -25,7 +34,6 @@ CREATE TABLE series (
     PRIMARY KEY  (serie_id),
     CONSTRAINT fk_serie_language FOREIGN KEY (language_id) REFERENCES language (language_id) ON DELETE cascade ON UPDATE CASCADE
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 
 
 ---------------SERIE INFO--------------
@@ -67,6 +75,7 @@ drop table if exists film_actor;
 CREATE TABLE film_actor (
     actor_id SMALLINT UNSIGNED NOT NULL,
     film_id SMALLINT UNSIGNED NOT NULL,
+    PRIMARY KEY(actor_id,film_id),
     CONSTRAINT fk_film_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE cascade ON UPDATE CASCADE,
     CONSTRAINT fk_film_actor_film FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE cascade ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -75,6 +84,7 @@ drop table if exists serie_actor;
 CREATE TABLE serie_actor (
     actor_id SMALLINT UNSIGNED NOT NULL,
     serie_id SMALLINT UNSIGNED NOT NULL,
+    PRIMARY KEY(actor_id,serie_id),
     CONSTRAINT fk_serie_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE cascade ON UPDATE CASCADE,
     CONSTRAINT fk_serie_actor_serie FOREIGN KEY (serie_id) REFERENCES series (serie_id) ON DELETE cascade ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -110,12 +120,7 @@ CREATE TABLE address (
     CONSTRAINT fk_address_city FOREIGN KEY (city_id) REFERENCES city (city_id) ON DELETE cascade ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-drop table if exists language;
-CREATE TABLE language (
-    language_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT,
-    name CHAR(20) NOT NULL,
-    PRIMARY KEY (language_id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 
 
 
@@ -141,7 +146,7 @@ drop table if exists serie_category;
 CREATE TABLE serie_category (
     serie_id SMALLINT UNSIGNED NOT NULL,
     category_id smallint UNSIGNED NOT NULL,
-    PRIMARY KEY (serie_id),
+    PRIMARY KEY (serie_id,category_id),
     CONSTRAINT fk_serie_category_film FOREIGN KEY (serie_id) REFERENCES series (serie_id) ON DELETE cascade ON UPDATE CASCADE,
     CONSTRAINT fk_serie_category_category FOREIGN KEY (category_id) REFERENCES category (category_id) ON DELETE cascade ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -191,7 +196,7 @@ create table film_rental (
     film_rental_date DATETIME,
     film_id smallint unsigned NOT NULL,
     customer_id smallint unsigned NOT NULL,
-    primary key (film_rental_id),
+    primary key (film_rental_id,film_id,customer_id),
     constraint fk_customer_id FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE on update cascade,
     constraint fk_film_inventory foreign key (film_id) REFERENCES film(film_id) ON DELETE CASCADE ON UPDATE cascade
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -203,7 +208,7 @@ create table episode_rental(
     episode_rental_date DATETIME,
     episode_id SMALLINT UNSIGNED NOT NULL, 
     customer_id SMALLINT UNSIGNED NOT NULL,
-    primary key (episode_rental_id),
+    primary key (episode_rental_id,episode_id,customer_id),
     constraint fk_customer_ep_id FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE CASCADE on update cascade,
     CONSTRAINT fk_inventory foreign key (episode_id) references episodes(episode_id) on delete cascade on update cascade
     
@@ -213,7 +218,6 @@ create table episode_rental(
 ------------------PAYMENT--------------
 
 drop table if exists film_payment;
-
 create table film_payment (
     film_payment_id smallint not null auto_increment,
     customer_id smallint unsigned NOT NULL,
