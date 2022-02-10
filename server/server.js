@@ -15,6 +15,18 @@ server.listen(5000);
 
 var connection = sql.createConnection(configure);
 
+
+const PayAmount = {
+    films:{
+        fs:0.3,
+        f:0.4
+    },
+    series:{
+        fs:0.1,
+        s:0.2
+    }
+}
+
 connection.connect(function(err) {
     if (err) connection = sql.createConnection(configure);
     console.log("Connected to sql database!");
@@ -94,10 +106,10 @@ io.on('connection', socket =>{
 
     socket.on('rentFilm', data=>{
         data = dataParser(data,",");
-        let amount = 0.4;
+        let amount = PayAmount.films.f;
 
         if(data[2] == 'FS'){
-            amount = 0.3;
+            amount = PayAmount.films.fs;
         }
 
         insertRental('film_rental','film_rental_date',data[1],data[0],"film_id").then(()=>{
@@ -110,6 +122,19 @@ io.on('connection', socket =>{
     socket.on("getFilms",()=>{
         getFilms("film").then(results=>{
             socket.emit("getFilms",results);
+            
+        });
+    });
+
+    socket.on('search',data=>{
+        getCertainFilm(data + "%").then(m=>{
+
+            getCertainSeries(data + "%").then(s=>{
+                socket.emit("takeSearch",{
+                    movies:m,
+                    series:s
+                });
+            });
             
         });
     });
@@ -147,9 +172,9 @@ io.on('connection', socket =>{
     socket.on('rentEpisode',data=>{
         data = dataParser(data,",");
         
-        let amount = 0.2;
+        let amount = PayAmount.series.s;
         console.log(data);
-        if(data[0] == 'FS') amount = 0.1;
+        if(data[0] == 'FS') amount = PayAmount.series.fs;
 
         insertRental("episode_rental","episode_rental_date",data[2],data[1],"episode_id").then(()=>{
             insertEpisodePayment(data[1],data[2],amount);
@@ -381,8 +406,84 @@ io.on('connection', socket =>{
         insertIntoAdmin(datap[1]).then(res =>{
             deleteFromTable('employees','employees_id',datap[1]).then()
             socket.emit('employee deleted',"");
-            
         });
+    });
+
+    socket.on('new employee',data =>{
+        insertInto('employees',data[1].firstname,data[1].lastname,data[1].email).then(res =>{
+            socket.emit('employee deleted',"");
+        })
+    });
+
+
+    socket.on('getAdmins',data =>{
+        getFromTable('administrator').then(data =>{
+            socket.emit('takeAdmins',data);
+        })
+    });
+
+    socket.on('changeToEmployee',data =>{
+        data = dataParser(data,",");
+
+        insertIntoEmployee(data[1]).then(res =>{
+            deleteFromTable('administrator','admin_id',data[1]).then();
+            socket.emit('admin deleted','')
+        });
+    });
+
+    socket.on('getInfoAdmin',data =>{
+        
+        getRentalProfits().then(data =>{
+            socket.emit('takeInfoAdmin',data);
+        });
+    });
+
+    socket.on("getAmount",data =>{
+        socket.emit('takeAmount',PayAmount);
+    });
+
+    socket.on("changeAmount",data =>{ //data[0] email!!!
+        
+        if(data[1] == "Films and Series"){
+            PayAmount.films.fs = data[2];
+            PayAmount.series.fs = data[3];
+
+        }
+        else if(data[1] == "Films"){
+            PayAmount.films.f = data[2];
+        }
+        else{
+            PayAmount.series.s = data[3];
+        }
+    });
+
+    socket.on('modify customer',data=>{ //data[0] email!!!
+
+        let choice; 
+
+        if(data[1].choice == "Films and Series") choice = "FS";
+        if(data[1].choice == "Series") choice = "S";
+        if(data[1].choice == "Films") choice = "F"
+        modifyCustomer(data[1].firstname,data[1].lastname,data[1].email,choice,data[1].id).then(()=>{
+            modifyAddress(data[1].address,data[1].district,data[1].city,data[1].postalCode,data[1].phone,data[1].address_id).then(()=>{
+                socket.emit('modify customer',"");
+            });
+        });
+    });
+
+    socket.on("new customer",data=>{ //data[0] email!!!
+        let choice; 
+        let date = new Date();
+        
+        if(data[1].choice == "Films and Series") choice = "FS";
+        if(data[1].choice == "Series") choice = "S";
+        if(data[1].choice == "Films") choice = "F"
+
+        newAddress(data[1].address,data[1].district,data[1].city,data[1].postalCode,data[1].phone).then(()=>{
+            newCustomer(data[1].firstname,data[1].lastname,data[1].email,data[1].address,data[1].phone,date,choice).then(()=>{
+                socket.emit('new customer',"");
+            })
+        })
     });
 });
 
@@ -744,7 +845,7 @@ function getCities() {
 
 function getCustomers(){
     let query = "select customer.customer_id,customer.first_name,customer.last_name,customer.email, customer.create_date,customer.active,customer.choice, "+
-    "address.address,address.district,city.city,country.country,address.postal_code, " +
+    "address.address, address.address_id, address.district,city.city,country.country,address.postal_code, " +
     "address.phone from customer " +
     "inner join address on address.address_id = customer.address_id " +
     "inner join city on address.city_id = city.city_id " +
@@ -991,3 +1092,145 @@ function insertIntoAdmin(employees_id){
     });
 
 }
+
+function insertIntoEmployee(admin_id){
+    let query = "INSERT INTO employees(first_name,last_name,email) select first_name,last_name,email from administrator where admin_id =?";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[admin_id],(err, res) => {
+            if(err) throw err;
+
+            else resolve();
+        });
+    });
+}
+
+function insertInto(tableName,firstname,lastname,email) {
+    let query = "INSERT INTO " + tableName + " (first_name,last_name,email) values(?,?,?)";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[firstname,lastname,email],(err, res) => {
+            if(err) throw err;
+
+            else resolve(); 
+        });
+    });
+}
+
+
+function getCertainFilm(title){
+    return new Promise((resolve, reject)=>{
+
+        let query = "SELECT film.film_id,title, description, release_year,language.name as language , length, rating, category.name as category FROM film inner join language on film.language_id = language.language_id inner join film_category on film_category.film_id = film.film_id inner join category on category.category_id = film_category.category_id where film.title like ? ORDER BY title asc ;"
+
+        connection.query(query,title,(err, results) =>{
+            if(err) throw err;
+
+            else{
+                
+               resolve(JSON.parse(JSON.stringify(results)));
+            }
+        })
+            
+    });
+}
+
+function getCertainSeries(title){
+
+    let query = "SELECT series.serie_id,title,description,release_year," +
+    "language.name as language,rating,category.name as category " +
+    "FROM series "+
+    "inner join language on series.language_id = language.language_id " +
+    "inner join serie_category on serie_category.serie_id = series.serie_id " +
+    "inner join category on category.category_id = serie_category.category_id where series.title like ? " +
+    "order by title asc;"
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,title,(err, results)=>{
+
+            if(err) throw err;
+
+            else{
+                resolve(JSON.parse(JSON.stringify(results)));
+            }
+        });
+
+    });
+}
+
+
+function getRentalProfits(){
+    let query  = 'call income()';
+
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,(err, results)=>{
+
+            if(err) throw err;
+
+            else{
+                resolve(JSON.parse(JSON.stringify(results[0])));
+            }
+        });
+
+    });
+}
+
+function modifyCustomer(firstname,lastname,email,choice,customer_id){
+    let query = "Update customer set first_name =? , last_name =? , email =?, choice = ? where customer_id = ?"
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[firstname,lastname,email,choice,customer_id],(err, results)=>{
+
+            if(err) throw err;
+            resolve(results);
+        });
+    });
+}
+
+
+function modifyAddress(address, district, city, postal_code,phone,address_id){
+    let query = "Update address set address =? , district =?, city_id = (select city_id from city where city.city =?), postal_code =?, phone =? where address_id =?"
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[address, district, city, postal_code,phone,address_id],(err, results)=>{
+            if(err) throw err;
+            resolve(results);
+        });
+    });
+}
+
+
+function newAddress(address, district, city,postalCode,phone){
+    let query = "insert ignore into address(address,district, city_id, postal_code,phone) "+
+    "values(?,?,(select city_id from city where city.city = ?),?,?)";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[address, district, city, postalCode,phone],(err, results)=>{
+            if(err) throw err;
+            resolve(results);
+        });
+    });
+}
+
+
+function newCustomer(firstname,lastname,email,address,phone,create_date,choice){
+    let query = "Insert into customer(first_name, last_name,email,address_id,active,create_date,choice) "+
+    "values(?,?,?,(select address_id from address where address=? and phone =?),1,?,?)";
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[firstname,lastname,email,address,phone,create_date,choice],(err, results)=>{
+            if(err) throw err;
+            resolve(results);
+        });
+    });
+}
+

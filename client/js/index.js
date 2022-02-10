@@ -41,6 +41,7 @@ let series = document.querySelector("#series");
 let owned = document.querySelector("#owned");
 let account = document.querySelector("#account");
 let category = document.querySelector("#type-name");
+let search = document.querySelector("#search-area");
 let divClicked = films;
 
 
@@ -54,6 +55,7 @@ let employeedivClicked = customers_employee;
 let customers_admin = document.querySelector(".admin .customers_button");
 let employees_button = document.querySelector(".admin .rental_button");
 let admins = document.querySelector(".admin .info_button");
+let info_admin = document.querySelector(".admin .most-viewed-button")
 let adminClicked = customers_admin;
 
 close.addEventListener('click', ()=>{
@@ -131,12 +133,33 @@ function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+search.addEventListener('keyup',(e)=>{
+    let searchContent = document.querySelector('.search-content');
+    if(search.value != ""){
+        socket.emit('search', search.value.toUpperCase());
+
+        socket.on('takeSearch',result=>{
+            document.querySelector("#search-movies").innerHTML = "";
+            document.querySelector('#search-series').innerHTML = "";
+            searchContent.style.display = "block";
+            createMovie(result.movies,'#search-movies');
+
+            createSeries(result.series,'#search-series')
+        });
+    }
+    else{
+        searchContent.style.display = "none";
+    }
+});
+
 
 series.addEventListener('click',()=>{
     series.style.backgroundColor = "#4d30d5";
     if(divClicked != series) divClicked.style.backgroundColor = "";
     divClicked = series;
+    search.value = '';
     document.querySelector('.content').innerHTML = "";
+    document.querySelector('.search-content').style.display = "none";
     category.innerHTML = "Series";
 
     if(customer_choice == 'FS'  || customer_choice == 'S'){
@@ -144,7 +167,7 @@ series.addEventListener('click',()=>{
         
         socket.on('takeSeries',series=>{
             document.querySelector('.content').innerHTML = "";
-            createSeries(series);
+            createSeries(series,'.content');
         });
     }
     else notRegistered();
@@ -154,7 +177,8 @@ series.addEventListener('click',()=>{
 films.addEventListener("click", ()=>{
     films.style.backgroundColor = "#4d30d5";
     if(divClicked != films) divClicked.style.backgroundColor = "";
-    
+    document.querySelector('.search-content').style.display = "none";
+    search.value = '';
     category.innerHTML = "Movies";
     divClicked = films;
     document.querySelector('.content').innerHTML = "";
@@ -164,7 +188,7 @@ films.addEventListener("click", ()=>{
         
         socket.on('takeFilms',movies=>{
             
-            createMovie(movies);
+            createMovie(movies,'.content');
         });
     }
     else notRegistered();
@@ -174,7 +198,8 @@ films.addEventListener("click", ()=>{
 owned.addEventListener('click',()=>{
     owned.style.backgroundColor = "#4d30d5";
     if(divClicked != owned) divClicked.style.backgroundColor = "";
-    
+    document.querySelector('.search-content').style.display = "none";
+    search.value = '';
     divClicked = owned;
     document.querySelector('.content').innerHTML = "";
     category.innerHTML = "Owned";
@@ -195,7 +220,8 @@ owned.addEventListener('click',()=>{
 });
 
 account.addEventListener('click',()=>{
-    
+    document.querySelector('.search-content').style.display = "none";
+    search.value = '';
     account.style.backgroundColor = "#4d30d5";
     if(divClicked != account) divClicked.style.backgroundColor = "";
     divClicked = account;
@@ -204,7 +230,7 @@ account.addEventListener('click',()=>{
     socket.emit('getCustomerInfo',id);
 
     socket.on('takeCustomerInfo',data=>{
-        createAccountInfo(data,".accountDiv");
+        createAccountInfo(data,".accountDiv","modify customer",account);
     });
 
 });
@@ -275,10 +301,10 @@ most_viewed_employee.addEventListener('click',()=>{
     waitToGetFilms('getMostRent','takeMostRent').then(mostRent=>{
 
         for(let film of mostRent.films){
-            createFilms(film,'films',document.querySelector('.content-employee'),mostRent.films);
+            createFilms(film,'films',document.querySelector('.content-employee'),mostRent.films.concat(mostRent.series));
         }
         for(let film of mostRent.series){
-            createFilms(film,'films',document.querySelector('.content-employee'),mostRent.series);
+            createFilms(film,'films',document.querySelector('.content-employee'),mostRent.films.concat(mostRent.series));
         }
         
     })
@@ -286,7 +312,7 @@ most_viewed_employee.addEventListener('click',()=>{
 
 
 customers_admin.addEventListener('click',()=>{
-
+    document.querySelector('.admin .addAdmin').style.display = 'none';
     let adminContent = document.querySelector('.admin-content');
     document.querySelector('.admin .accountDiv').style.display = "none";
     customers_admin.style.backgroundColor = "#4d30d5";
@@ -336,6 +362,7 @@ employees_button.addEventListener('click', () =>{
     adminClicked = employees_button;
 
     waitToGetFilms('getEmployees','takeEmployees').then(employees =>{
+        document.querySelector('.admin .addAdmin').style.display = 'none';
         adminContent.innerHTML ="";
         for(let employee of employees){
             
@@ -365,11 +392,109 @@ employees_button.addEventListener('click', () =>{
         }
         addEmployee(adminContent,'employee');
         socket.on('employee deleted',data=>{
+            adminContent.innerHTML ="";
             employees_button.click();
         })
     });
     
-})
+});
+
+admins.addEventListener('click', () =>{
+
+    let adminContent = document.querySelector('.admin-content');
+    adminContent.innerHTML ="";
+    document.querySelector('.admin .accountDiv').style.display = "none";
+
+    admins.style.backgroundColor = "#4d30d5";
+    
+    if(adminClicked != admins) adminClicked.style.backgroundColor = "";
+
+    adminClicked = admins;
+
+    waitToGetFilms('getAdmins','takeAdmins').then(admins =>{
+        document.querySelector('.admin .addAdmin').style.display = 'none';
+        adminContent.innerHTML ="";
+
+        for(let admin of admins){
+            
+            let customerButton = createCustomersAdmin(admin);
+            customerButton.style.animation = "none";
+            customerButton.style.opacity = '1';
+            customerButton.addEventListener('click', () =>{
+                
+                let changeToAdmin = document.createElement('button');
+                changeToAdmin.appendChild(document.createTextNode("change to employee"));
+
+                changeToAdmin.className = "changeToAdmin";
+                adminContent.appendChild(changeToAdmin);
+                
+                changeToAdmin.addEventListener('click', () =>{
+                    
+                    socket.emit("changeToEmployee",mail + "," + admin.admin_id);
+                });
+            });
+        }
+    });
+    socket.on('admin deleted',data=>{
+        adminContent.innerHTML ="";
+        admins.click();
+    });
+});
+
+
+info_admin.addEventListener('click', () =>{
+
+    let adminContent = document.querySelector('.admin-content');
+    adminContent.innerHTML ="";
+    document.querySelector('.admin .accountDiv').style.display = "none";
+
+    info_admin.style.backgroundColor = "#4d30d5";
+    
+    if(adminClicked != info_admin) adminClicked.style.backgroundColor = "";
+
+    adminClicked = info_admin;
+
+    waitToGetFilms('getInfoAdmin','takeInfoAdmin').then(result =>{
+        
+        const monthNames = ["","January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        let row = document.createElement("div");
+        row.id = "adminRow";
+
+        let month = document.createElement("div");
+        month.appendChild(document.createTextNode("Month"));
+        month.id = "month";
+
+        let totalIncome = document.createElement("div");
+        totalIncome.appendChild(document.createTextNode("Total Income"));
+        totalIncome.id = "totalIncome";
+
+        row.appendChild(month);
+        row.appendChild(totalIncome);
+        adminContent.appendChild(row);
+
+        changePrices(adminContent);
+
+        for(let i =1; i<13; ++i) {
+            let monthName = document.createElement('div');
+            monthName.appendChild(document.createTextNode(monthNames[i]));
+            month.appendChild(monthName);
+            let income = document.createElement('div');
+            totalIncome.appendChild(income);
+
+            const el = result.filter(element =>{
+                if(element.month == i) return element;
+
+                else return 0;
+            });
+
+            if(el.length > 0) income.appendChild(document.createTextNode((el[0].incomeFilm + el[0].incomeSerie)));
+            
+            else income.appendChild(document.createTextNode(0));
+        }
+    });
+});
+
 
 
 signin.addEventListener('click',(e)=>{
@@ -386,7 +511,7 @@ signin.addEventListener('click',(e)=>{
         
         socket.on('getFilms', movies => {
             
-            if(customer_choice == 'FS' || customer_choice == 'F') createMovie(movies);
+            if(customer_choice == 'FS' || customer_choice == 'F') createMovie(movies,".content");
 
             else notRegistered();
             
@@ -529,18 +654,19 @@ function createCategories(socket){
 }
 
 
-function createMovie(movies){
+function createMovie(movies,content){
     document.querySelector(".accountDiv").style.display = "none";
-    document.querySelector('.content').innerHTML = "";
+    //document.querySelector(content).innerHTML = "";
     document.querySelector('.movieInfo').style.display = "none";
-    document.querySelector('.content').style.animation = "none";
-    document.querySelector('.content').style.opacity= "1";
+    document.querySelector(content).style.animation = "none";
+    document.querySelector(content).style.opacity= "1";
     let movies_count = document.createElement("div");
     
     movies_count.appendChild(document.createTextNode(movies.length + " movies"));
     movies_count.className = "movie-count";
     
-    document.querySelector('.content').appendChild(movies_count);
+    document.querySelector(content).appendChild(movies_count);
+    if(startCount !=0) movies_count.style.opacity = "1";
     
     ++startCount;
     for(let movie of movies){
@@ -583,7 +709,7 @@ function createMovie(movies){
         button.appendChild(yearDiv);
         button.appendChild(imgDiv);
         
-        document.querySelector('.content').appendChild(button);
+        document.querySelector(content).appendChild(button);
         
 
         button.addEventListener('click',()=>{
@@ -718,17 +844,18 @@ function createStandardMovieInfoHtml(button,movieDiv,movie){
 
 }
 
-function createSeries(movies){
+function createSeries(movies,content){
     document.querySelector(".accountDiv").style.display = "none";
     document.querySelector('.movieInfo').style.display = "none";
-    document.querySelector('.content').style.animation = "none";
-    document.querySelector('.content').style.opacity= "1";
+    document.querySelector(content).innerHtml = "";
+    document.querySelector(content).style.animation = "none";
+    document.querySelector(content).style.opacity= "1";
     let movies_count = document.createElement("div");
     
     movies_count.style.opacity = "1";
     movies_count.appendChild(document.createTextNode(movies.length + " series"));
     movies_count.className = "movie-count";
-    document.querySelector('.content').appendChild(movies_count);
+    document.querySelector(content).appendChild(movies_count);
     
 
     for(let movie of movies){
@@ -766,7 +893,7 @@ function createSeries(movies){
         button.appendChild(yearDiv);
         button.appendChild(imgDiv);
         
-        document.querySelector('.content').appendChild(button);
+        document.querySelector(content).appendChild(button);
 
         button.addEventListener('click',()=>{
             
@@ -909,14 +1036,12 @@ function createEpisodes(episodes,season,movie) {
         div.appendChild(text);
         episodeDiv.appendChild(div);
         
-        console.log(episode.owned);
         if(episode.owned == true){
             div.style.display = "block";
             
         }
         else rentbutton.style.display = "block";
-        
-        
+    
     }
 }
 
@@ -1014,7 +1139,7 @@ function createOwned(movies,div,contentDiv){
     }
 }
 
-function createAccountInfo(data,div){
+function createAccountInfo(data,div,messageTosocket,button){
     
     socket.emit("getCities","");
     let accountDiv = document.querySelector(div);
@@ -1092,6 +1217,56 @@ function createAccountInfo(data,div){
         }
         
     });
+
+    document.querySelector(div + ' .save').addEventListener('click',()=>{
+        let cityn = cityname.innerHTML;
+        let c = choice.innerHTML;
+        customer_choice = c;
+        if(firstname.value != "" && lastname.value != "" && address.value != "" && district.value != "" &&  postalCode.value != "" && phone.value != "" && email.value != "" && cityname.innnerHtml !=""){
+            if(messageTosocket == "modify customer"){
+               
+                socket.emit(messageTosocket,[mail,{
+                    id:data.customer_id,
+                    firstname:firstname.value,
+                    lastname:lastname.value,
+                    address_id:data.address_id,
+                    address:address.value,
+                    district:district.value,
+                    postalCode:postalCode.value,
+                    phone:phone.value,
+                    email:data.email, 
+                    choice:c,
+                    city:cityn
+                }])
+            }
+            else{
+                socket.emit(messageTosocket,[mail,{
+                    firstname:firstname.value,
+                    lastname:lastname.value,
+                    address:address.value,
+                    district:district.value,
+                    postalCode:postalCode.value,
+                    phone:phone.value,
+                    email:email.value, 
+                    choice:c,
+                    city:cityn
+                }])
+            }
+            firstname.value = "" ;
+            lastname.value = "" ;
+            address.value = "" ;
+            district.value = "";
+            postalCode.value = "" ;
+            phone.value = "" ;
+            email.value = "" ;
+            cityname.innnerHtml ="";
+
+            socket.on(messageTosocket,()=>{
+                button.click();
+            })
+            
+        }
+    })
     
 }
 
@@ -1170,7 +1345,7 @@ function createCustomers(customers) {
 
         button.addEventListener('click',()=>{
            
-            createAccountInfo(customer,'.employee-accountDiv');
+            createAccountInfo(customer,'.employee-accountDiv',"modify customer",customers_employee);
             document.querySelector('.close').addEventListener('click',()=>{
                 accountDiv.style.display = "none";
             })
@@ -2284,7 +2459,7 @@ function addCustomer(adminContent){
                 district:"",
                 create_date:new Date(),
             }
-        ,'.admin .accountDiv');
+        ,'.admin .accountDiv',"new customer",customers_admin);
 
         document.querySelector('.admin .accountDiv .close').addEventListener('click',()=>{
             document.querySelector('.admin .accountDiv').style.display = "none";
@@ -2304,7 +2479,115 @@ function addEmployee(adminContent,createName){
         document.querySelector('.admin .addAdmin').style.animation = 'showAdmin 500ms cubic-bezier(0.34, 1.21, 0.74, 1.4) forwards';
 
         document.querySelector('.addAdmin .close').addEventListener('click',()=>{
-            
+            document.querySelector('.admin .addAdmin').style.display = 'none'; 
+        });
+
+        document.querySelector('.addAdmin .save').addEventListener('click',()=>{
+
+            if(document.querySelector('.addAdmin #firstnameArea').value != null && document.querySelector('.addAdmin #lastnameArea').value != null && document.querySelector('.addAdmin #emailtxt').value != null){
+                socket.emit("new " + createName,[mail,{
+                    firstname:document.querySelector('.addAdmin #firstnameArea').value,
+                    lastname:document.querySelector('.addAdmin #lastnameArea').value,
+                    email:document.querySelector('.addAdmin #emailtxt').value
+                }]);
+
+                document.querySelector('.addAdmin #firstnameArea').value = "";
+                document.querySelector('.addAdmin #lastnameArea').value = "";
+                document.querySelector('.addAdmin #emailtxt').value = "";
+            }
         });
     });
+}
+
+
+function changePrices(adminContent){
+
+
+    let changeAmount = document.createElement("button");
+    changeAmount.id = "add-content";
+    changeAmount.appendChild(document.createTextNode("Change rent prices"));
+    adminContent.appendChild(changeAmount);
+
+    changeAmount.addEventListener('click',()=>{
+
+        waitToGetFilms('getAmount','takeAmount').then(amount =>{
+            let chooseType = document.createElement('div');
+            let chooser = document.createElement('button');
+            chooser.appendChild(document.createTextNode('Choose Type'));
+            chooser.style.border = "1px white solid";
+            chooseType.appendChild(chooser);
+            let chooseContent = document.createElement('div');
+    
+            chooseContent.className = 'countryContent';
+            chooseType.style.left = "20%";
+    
+            chooseType.appendChild(chooseContent);
+            chooseType.className = "countryChoose";
+    
+            adminContent.appendChild(chooseType);
+
+            let amountDiv = document.createElement('div');
+            let amountArea = document.createElement('textarea');
+            let amountEpArea = document.createElement('textarea');
+            amountDiv.appendChild(document.createTextNode("Price:"));
+            amountArea.setAttribute('maxlength',10);
+            amountEpArea.setAttribute('maxlength',10);
+            amountDiv.id = "amountDiv";
+
+            let save = document.createElement('button');
+            save.id = "save";
+            save.appendChild(document.createTextNode("Save"));
+
+            amountDiv.appendChild(save);
+    
+            for(let type of ["Films and Series","Films","Series"]){
+                let button = document.createElement('button');
+                button.appendChild(document.createTextNode(type));
+                chooseContent.appendChild(button);
+                
+                button.addEventListener('focus', ()=>{
+                    chooser.innerHTML = button.innerHTML;
+                    save.style.display = 'block';
+                    amountDiv.style.display = 'block';
+
+                    if(type == "Films and Series"){
+                        amountArea.setAttribute("placeholder","movies: " + amount.films.fs);
+                        amountEpArea.setAttribute("placeholder","Series: " + amount.series.fs);
+                        amountEpArea.style.display = "inline-flex";
+                        amountArea.style.display = "inline-flex";
+                    }
+                    else if(type == "Films"){
+                        amountArea.setAttribute("placeholder","movies: " + amount.films.f);
+                        amountEpArea.setAttribute("placeholder","");
+                        amountEpArea.style.display = "none";
+                        amountArea.style.display = "inline-flex";
+                    }
+                    else{
+                        amountEpArea.style.display = "inline-flex";
+                        amountArea.style.display = "none";
+                        amountEpArea.setAttribute("placeholder","Series: " + amount.series.s);
+                        amountArea.setAttribute("placeholder","");
+                    }
+                    amountDiv.appendChild(amountArea);
+                    amountDiv.appendChild(amountEpArea);
+                    adminContent.appendChild(amountDiv);
+
+                    amountArea.addEventListener('keypress', (e)=>{
+                        if(e.key == 'Enter'){
+                            e.preventDefault();   
+                        }
+                    });
+
+                    save.addEventListener('click',()=>{
+                        if(amountArea.value != "" ){
+                            if(parseFloat(amountArea.value) != NaN){
+                                socket.emit("changeAmount",[mail,type,amountArea.value,amountEpArea.value]);
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    });
+
 }

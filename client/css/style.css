@@ -76,8 +76,6 @@ body {
 }
 
 
-
-
 #title-bar-btns :hover{
     background-color: #4a4949;
 }
@@ -752,6 +750,7 @@ body {
     box-shadow: 0px 0px 5px black;
     width:calc(100vw - 407px);
     /*height:calc(100vh - 677px);*/
+    z-index:1;
     height:calc(100vh - 62%);
     font-family:Oswald;
     color:white;
@@ -1091,6 +1090,7 @@ body {
     height:100%;
     color:white;
     background-color:#0f1827;
+    z-index:2;
     /*animation: revealAccount 1.5s forwards cubic-bezier(0.03, 0.88, 0.76, 1.02);*/
 }
 
@@ -2198,7 +2198,6 @@ body {
     top:5%;
     left:30%;
     color:white;
-    
     z-index:2 ;
     width:200px;
     overflow-x:clip;
@@ -2225,14 +2224,14 @@ body {
 
 .countryContent{
     opacity:0;
-     transform:translateY(-10px);
-     transition:150ms ease-in;
+    transform:translateY(-10px);
+    transition:150ms ease-in;
     background-color:#1a263a;
     pointer-events:none;
 }
 
 .countryChoose button:focus-within{
-     background-color:#1a263a;
+    background-color:#1a263a;
 }
 
 .countryChoose button:focus-within + .countryContent{
@@ -2262,6 +2261,7 @@ body {
     border:1px white solid;
     background-color:#575557;
 }
+
 .row_address div div{
     position:relative;
     top:15px;
@@ -2302,12 +2302,10 @@ body {
     border-radius:30px;
 }
 
-
-
 .address-col{
     position:relative;
     top:35px;
-     color:#71DFBE;
+    color:#71DFBE;
     left:5%;
     font-family:Oswald;
     letter-spacing:1.1px;
@@ -2319,7 +2317,7 @@ body {
 .address-district{
     position:relative;
     top:35px;
-     color:#71DFBE;
+    color:#71DFBE;
     left:15%;
     font-family:Oswald;
     letter-spacing:1.1px;
@@ -2430,9 +2428,9 @@ body {
 }
 
 .phone-address{
-     position:absolute;
+    position:absolute;
     top:55%;;
-     color:#71DFBE;
+    color:#71DFBE;
     left:45%;
     font-family:Oswald;
     letter-spacing:1.1px;
@@ -2446,7 +2444,6 @@ body {
     top:58%;
     left:62%;
     color:white;
-    
     z-index:2 ;
     width:200px;
     overflow-x:clip;
@@ -2689,4 +2686,119 @@ body {
     to{
         top:500px;
     }
+}
+
+.search-content{
+    display:none;
+   
+}
+
+#search-movies{
+    position:absolute;
+    top:80px;
+    left:130px;
+    height:47%;
+    background-color:transparent;
+    backdrop-filter:blur(90px);
+    width:calc(100vw - 130px);
+    z-index:1;
+    overflow-y:auto;
+    overflow-x:clip;
+}
+
+#search-series{
+    position:absolute;
+    bottom:0px;
+    left:130px;
+    height:46%;
+    background-color:transparent;
+    backdrop-filter:blur(90px);
+    width:calc(100vw - 130px);
+    z-index:1;
+    overflow-y:auto;
+    overflow-x:clip;
+}
+
+#adminRow{
+    position:absolute;
+    top:15%;
+    left:40%;
+    display:flex;
+    color:white;
+}
+
+#adminRow div{
+    position:relative;
+    padding:10px;
+    top:10px;
+    display:flex;
+    left:-11px;
+    text-align:center;
+    width:150px;
+    font-family:Oswald;
+    font-size:20px;
+    letter-spacing:1.1px;
+    border:1px grey solid;
+    display:block;
+}
+
+#month{
+    background-color:#3e3d3d;
+}
+
+#totalIncome{
+    background-color:#6664646a;
+}
+
+#amountDiv{
+    position:absolute;
+    left:35%;
+    top:5%;
+    color:#71DFBE;
+    font-family:Oswald;
+    font-size:23px;
+    letter-spacing:1.1px;
+    text-transform:uppercase;
+    display: none;
+}
+
+#amountDiv textarea{
+    position:relative;
+    resize:none;
+    background-color:#0105134e;
+    border:none;
+    margin-left:30px;
+    outline:none;
+    border-radius:7px;
+    left:-10px;
+    top:5px;
+    font-size:20px;
+    font-family:Oswald;
+    height:30px;
+    overflow:hidden;
+    color:white;
+    width:100px;
+}
+
+#save{
+    position:absolute;
+    left:120%;
+    top:20%;
+    letter-spacing:1.1px;
+    color:white;
+    background-color:transparent;
+    border:1px white solid;
+    padding-left:20px;
+    padding-right:20px;
+    text-transform:uppercase;
+    font-size:17px;
+    font-weight:bold;
+    font-family:Oswald;
+    transition:.2s cubic-bezier(0.42, 0, 0.19, 1);
+}
+
+#save:hover{
+    cursor:pointer;
+    
+    box-shadow:0px 1px 7px grey;
 }
