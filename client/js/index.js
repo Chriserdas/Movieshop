@@ -161,7 +161,7 @@ series.addEventListener('click',()=>{
     document.querySelector('.content').innerHTML = "";
     document.querySelector('.search-content').style.display = "none";
     category.innerHTML = "Series";
-
+    document.querySelector('.accountDiv').style.display = "none";
     if(customer_choice == 'FS'  || customer_choice == 'S'){
         socket.emit('getSeries','');
         
@@ -178,6 +178,7 @@ films.addEventListener("click", ()=>{
     films.style.backgroundColor = "#4d30d5";
     if(divClicked != films) divClicked.style.backgroundColor = "";
     document.querySelector('.search-content').style.display = "none";
+    document.querySelector('.accountDiv').style.display = "none";
     search.value = '';
     category.innerHTML = "Movies";
     divClicked = films;
@@ -204,6 +205,7 @@ owned.addEventListener('click',()=>{
     document.querySelector('.content').innerHTML = "";
     category.innerHTML = "Owned";
     socket.emit('getOwned',id)
+    document.querySelector('.accountDiv').style.display = "none";
     socket.on('Owned',results=>{
         let movies_count = document.createElement("div");
         let amount = results.films.length + results.episodes.length;
@@ -227,11 +229,9 @@ account.addEventListener('click',()=>{
     divClicked = account;
     document.querySelector('.content').innerHTML = "";
     
-    socket.emit('getCustomerInfo',id);
-
-    socket.on('takeCustomerInfo',data=>{
-        createAccountInfo(data,".accountDiv","modify customer",account);
-    });
+    getCustomerInfo().then(data=>{
+        createAccountInfo(data,".accountDiv","modify customer");
+    })
 
 });
 
@@ -597,7 +597,7 @@ function checkCredentials(isAuthenticated){
         messageDiv.className = "messageDiv";
         document.querySelector(".user-box").appendChild(messageDiv);
         messageDiv.style.backgroundColor = "red";
-        //messageDiv.style.width = "220px";
+
         setTimeout(()=>{
             signin.classList.remove('animating')
             document.querySelector(".checkmark-container").style.opacity ="0";
@@ -656,7 +656,6 @@ function createCategories(socket){
 
 function createMovie(movies,content){
     document.querySelector(".accountDiv").style.display = "none";
-    //document.querySelector(content).innerHTML = "";
     document.querySelector('.movieInfo').style.display = "none";
     document.querySelector(content).style.animation = "none";
     document.querySelector(content).style.opacity= "1";
@@ -756,7 +755,7 @@ function createRentButton(socket,movie) {
     document.querySelector('.movieInfo').appendChild(button);
 
     button.addEventListener('click',()=>{
-        socket.emit('rentFilm',id + "," +  movie.film_id + "," + customer_choice);
+        socket.emit('rentFilm',id + "," +  movie.film_id + "," + customer_choice + "," + mail);
         
     });
 
@@ -1025,7 +1024,7 @@ function createEpisodes(episodes,season,movie) {
         episodeDiv.appendChild(rentbutton);
         
         rentbutton.addEventListener('click',()=>{
-            socket.emit('rentEpisode',customer_choice + "," + id + "," + episode.result.episode_id)
+            socket.emit('rentEpisode',customer_choice + "," + id + "," + episode.result.episode_id + "," + mail)
             movieInfo.style.animation = "hideMovieInfo .6s forwards ";
         });
 
@@ -1079,7 +1078,6 @@ function waitForEpisodes(season){
 function createOwned(movies,div,contentDiv){
     document.querySelector(".accountDiv").style.display = "none";
     document.querySelector(div +' .movieInfo').style.display = "none";
-    //document.querySelector(contentDiv).style.animation = "none";
     document.querySelector(contentDiv).style.opacity= "1";
    
     
@@ -1150,6 +1148,7 @@ function createAccountInfo(data,div,messageTosocket,button){
     let choice = document.querySelector(div+" #chosen");
     let choice1 = document.querySelector(div+" #choice1");
     let choice2 = document.querySelector(div+" #choice2");
+    let choice3 = document.querySelector(div+" #choice3");
     let address = document.querySelector(div+" #addressArea");
     let district = document.querySelector(div+" #districtArea");
     let postalCode = document.querySelector(div+" #postalcodeArea");
@@ -1180,22 +1179,20 @@ function createAccountInfo(data,div,messageTosocket,button){
 
     if(data.choice == 'FS'){
         choice.innerHTML = "Films and Series";
-        choice1.innerHTML = "Films"
-        choice2.innerHTML = "Series"
     }
     else if(data.choice == 'S'){
         choice.innerHTML = "Series";
-        choice1.innerHTML = "Films"
-        choice2.innerHTML = "Films and Series"
     }
     else if(data.choice == 'F'){
         choice.innerHTML = "Films";
-        choice1.innerHTML = "Series"
-        choice2.innerHTML = "Films and Series"
     }
+    choice1.innerHTML = "Films and Series"
+    choice2.innerHTML = "Films"
+    choice3.innerHTML = "Series"
 
     changeInnerHtml(choice1,choice);
     changeInnerHtml(choice2,choice);
+    changeInnerHtml(choice3,choice);
     socket.on('cities',cities=>{
         document.querySelector(div+" .city-content").innerHTML = "";
     
@@ -1217,11 +1214,18 @@ function createAccountInfo(data,div,messageTosocket,button){
         }
         
     });
-
+    
     document.querySelector(div + ' .save').addEventListener('click',()=>{
         let cityn = cityname.innerHTML;
         let c = choice.innerHTML;
-        customer_choice = c;
+
+        if(c == "Films and Series"){
+            customer_choice = "FS"
+        }
+        else if(c == "Series") customer_choice = "S "
+        else customer_choice = "F";
+        
+
         if(firstname.value != "" && lastname.value != "" && address.value != "" && district.value != "" &&  postalCode.value != "" && phone.value != "" && email.value != "" && cityname.innnerHtml !=""){
             if(messageTosocket == "modify customer"){
                
@@ -1251,19 +1255,19 @@ function createAccountInfo(data,div,messageTosocket,button){
                     choice:c,
                     city:cityn
                 }])
+                firstname.value = "" ;
+                lastname.value = "" ;
+                address.value = "" ;
+                district.value = "";
+                postalCode.value = "" ;
+                phone.value = "" ;
+                email.value = "" ;
+                cityname.innnerHtml ="";
             }
-            firstname.value = "" ;
-            lastname.value = "" ;
-            address.value = "" ;
-            district.value = "";
-            postalCode.value = "" ;
-            phone.value = "" ;
-            email.value = "" ;
-            cityname.innnerHtml ="";
-
+            
             socket.on(messageTosocket,()=>{
                 button.click();
-            })
+            });
             
         }
     })
@@ -1275,9 +1279,7 @@ function changeInnerHtml(button,buttonToSwitch){
     return new Promise((resolve, reject) => {
         
         button.addEventListener('click',()=>{
-            let choiceText = buttonToSwitch.innerHTML;
             buttonToSwitch.innerHTML = button.innerHTML;
-            button.innerHTML = choiceText;
             resolve();
         })
     })
@@ -1286,11 +1288,7 @@ function changeInnerHtml(button,buttonToSwitch){
 
 
 function createCustomers(customers) {
-    //document.querySelector(".accountDiv").style.display = "none";
     document.querySelector('.content-employee').innerHTML = "";
-    
-    //document.querySelector('.content').style.animation = "none";
-    //document.querySelector('.content').style.opacity= "1";
     let movies_count = document.createElement("div");
     
     movies_count.appendChild(document.createTextNode(customers.length + " customers"));
@@ -1300,7 +1298,6 @@ function createCustomers(customers) {
     let accountDiv = document.querySelector('.employee-accountDiv')
     ++startCount;
     for(let customer of customers){
-        //let movieDiv = document.querySelector('.movieInfo');
         
         let button = document.createElement("button");
         let img = document.createElement("img");
@@ -1346,8 +1343,9 @@ function createCustomers(customers) {
         button.addEventListener('click',()=>{
            
             createAccountInfo(customer,'.employee-accountDiv',"modify customer",customers_employee);
-            document.querySelector('.close').addEventListener('click',()=>{
+            document.querySelector('.employee-accountDiv .close').addEventListener('click',()=>{
                 accountDiv.style.display = "none";
+                
             })
 
         });
@@ -1593,7 +1591,7 @@ function createInfo() {
         add.addEventListener('click',()=>{
 
             if(firstnameArea.value !="" && lastnameArea.value !=""){
-                socket.emit('add actor',firstnameArea.value + "," + lastnameArea.value);
+                socket.emit('add actor',firstnameArea.value + "," + lastnameArea.value + "," + mail);
                 firstnameArea.value = "";
                 lastnameArea.value = "";
             }
@@ -1626,7 +1624,7 @@ function createInfo() {
 
         deleteButton.addEventListener("click",()=>{
             if(fnarea.value != "" && lnarea.value != ""){
-                socket.emit('delete actor',fnarea.value + "," + lnarea.value);
+                socket.emit('delete actor',fnarea.value + "," + lnarea.value + "," + mail);
                 fnarea.value = "" ;
                 lnarea.value = "";
             }
@@ -1683,7 +1681,7 @@ function createInfo() {
 
                     deleteDiv.addEventListener('click',()=>{
                         movieInfo.style.display = "none";
-                        socket.emit("delete film",film.film_id);
+                        socket.emit("delete film",[film.film_id,mail]);
                     });
                 });
             }
@@ -1739,7 +1737,7 @@ function createInfo() {
                     movieInfo.appendChild(deleteDiv);
 
                     deleteDiv.addEventListener('click',()=>{     
-                        socket.emit("delete series",film.serie_id);
+                        socket.emit("delete series",[film.serie_id,mail]);
 
                         socket.on("series deleted",data=>{
                             movieInfo.style.display = "none";
@@ -1789,7 +1787,7 @@ function createInfo() {
                 if(event.key == "Enter" && name.value!=0 ) {
                     event.preventDefault();
                     if(languages.some(e =>e.name == capitalizeFirstLetter(name.value)) == 0){
-                        socket.emit("new language",capitalizeFirstLetter(name.value));
+                        socket.emit("new language",[capitalizeFirstLetter(name.value),mail]);
                         name.value = "";
                     }
                     else{
@@ -1846,7 +1844,7 @@ function createInfo() {
                 if(event.key == "Enter" && name.value!=0 ) {
                     event.preventDefault();
                     if(categories.some(e =>e.name == capitalizeFirstLetter(name.value)) == 0){
-                        socket.emit("new category",capitalizeFirstLetter(name.value));
+                        socket.emit("new category",[capitalizeFirstLetter(name.value),mail]);
                         name.value = "";
                     }
                     else{
@@ -1903,7 +1901,7 @@ function createInfo() {
                 if(event.key == "Enter" && name.value!=0 ) {
                     event.preventDefault();
                     if(countries.some(e =>e.country == capitalizeFirstLetter(name.value)) == 0){
-                        socket.emit("new country",capitalizeFirstLetter(name.value));
+                        socket.emit("new country",[capitalizeFirstLetter(name.value),mail]);
                         name.value = "";
                     }
                     else{
@@ -1982,7 +1980,7 @@ function createInfo() {
                     event.preventDefault();
                     if(name.value!=0 && countryTitle.innerHTML != "choose country") {
                         if(cities.some(e =>e.city == capitalizeFirstLetter(name.value)) == 0){
-                            socket.emit("new city",capitalizeFirstLetter(name.value) + "," + countryTitle.innerHTML);
+                            socket.emit("new city",capitalizeFirstLetter(name.value) + "," + countryTitle.innerHTML + "," + mail);
                             name.value = "";
                         }
                         else{
@@ -2239,7 +2237,8 @@ function createFilmHtml(title,description,release_year,language,length,rating,di
                     length: lengthdivarea.value,
                     rating: ratingTitle.innerHTML,
                     category: categoryTitle.innerHTML,
-                    id:film_id
+                    id:film_id,
+                    email:mail
                 } 
             );
         }
@@ -2273,7 +2272,7 @@ function createOneRowDivs(title,contentDiv,messageTosocket,divid){
         contentDiv.appendChild(btn);
 
         btn.addEventListener('click',()=>{
-            socket.emit(messageTosocket,divid)
+            socket.emit(messageTosocket,[divid,mail])
         })
     })
 }
@@ -2323,7 +2322,7 @@ function createAddress(contentDiv,addresses){
             document.querySelector('.address-content .save').addEventListener('click',()=>{
 
                 if(document.querySelector('.address-content #addressArea').value !='' && document.querySelector('.address-content #districtArea').value != '' && cityChoice.innerHTML !='Choose city' && document.querySelector('.address-content #postalcodeArea').value != ''  && document.querySelector('.address-content #phoneArea').value != ''){
-                    socket.emit('new address',[document.querySelector('.address-content #addressArea').value,document.querySelector('.address-content #districtArea').value,cityChoice.innerHTML,document.querySelector('.address-content #postalcodeArea').value, document.querySelector('.address-content #phoneArea').value]);
+                    socket.emit('new address',[document.querySelector('.address-content #addressArea').value,document.querySelector('.address-content #districtArea').value,cityChoice.innerHTML,document.querySelector('.address-content #postalcodeArea').value, document.querySelector('.address-content #phoneArea').value,mail]);
                 }
             });
 
@@ -2364,7 +2363,7 @@ function createAddress(contentDiv,addresses){
         phoneDiv.appendChild(deleteButton);
 
         deleteButton.addEventListener('click',()=>{
-            socket.emit('delete address',address.address_id);
+            socket.emit('delete address',[address.address_id,mail]);
         });
 
     }
@@ -2590,4 +2589,17 @@ function changePrices(adminContent){
         });
     });
 
+}
+
+function getCustomerInfo(){
+
+    return new Promise((resolve, reject)=>{
+        socket.emit('getCustomerInfo',id);
+
+        socket.on('takeCustomerInfo',data=>{
+            resolve(data);
+            
+        });
+    })
+    
 }

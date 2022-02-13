@@ -115,7 +115,11 @@ io.on('connection', socket =>{
         insertRental('film_rental','film_rental_date',data[1],data[0],"film_id").then(()=>{
             insertFilmPayment(data[0],data[1],amount);
             socket.emit('rent_done','');
-        });
+            insertIntoLog(data[3],"film_rental","Insert",new Date,"yes")
+        })
+        .catch(err => {
+            insertIntoLog(data[3],"film_rental","Insert",new Date,"no")
+        })
         
     });
 
@@ -147,12 +151,14 @@ io.on('connection', socket =>{
         });
     });
 
+
     socket.on('getSeasons',data=>{
         getSeasons(parseInt(data)).then(result=>{
 
             socket.emit('takeSeasons',result);
         });
     });
+
 
     socket.on('getEpisodes',data=>{
         data = dataParser(data,",");
@@ -173,12 +179,16 @@ io.on('connection', socket =>{
         data = dataParser(data,",");
         
         let amount = PayAmount.series.s;
-        console.log(data);
         if(data[0] == 'FS') amount = PayAmount.series.fs;
 
         insertRental("episode_rental","episode_rental_date",data[2],data[1],"episode_id").then(()=>{
             insertEpisodePayment(data[1],data[2],amount);
-        });
+            insertIntoLog(data[3],"episode_rental","Insert",new Date,"yes");
+            
+
+        }).catch(err=>{
+            insertIntoLog(data[3],"episode_rental","Insert",new Date,"no");
+        })
     })
 
     //----------------Owned------------------
@@ -196,7 +206,6 @@ io.on('connection', socket =>{
     //-----------------Account---------------------
 
     socket.on('getCustomerInfo',customer_id=>{
-        console.log(customer_id);
         getAccountInfo(customer_id).then(result =>{
             socket.emit('takeCustomerInfo',result[0]);
         });
@@ -220,7 +229,12 @@ io.on('connection', socket =>{
 
     socket.on('add actor',data=>{
         data = dataParser(data,",");
-        addactor(data[0],data[1]);
+        addactor(data[0],data[1]).then(result=>{
+            insertIntoLog(data[2],"actor","Insert",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[2],"actor","Insert",new Date(),"no");
+        })
+        
     });
 
     socket.on('delete actor',data=>{
@@ -228,12 +242,19 @@ io.on('connection', socket =>{
 
         deleteActor(data[0],data[1]).then(result=>{
             socket.emit('actor deleted',"");
+
+            insertIntoLog(data[2],"actor","delete",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[2],"actor","delete",new Date(),"no");
         })
     })
 
     socket.on('delete film',data=>{
-        deleteFromTable('film', "film.film_id", data).then(()=>{
+        deleteFromTable('film', "film.film_id", data[0]).then(()=>{
             socket.emit('film deleted',"")
+            insertIntoLog(data[1],"film","delete",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[1],"film","delete",new Date(),"no");
         })
     });
 
@@ -242,38 +263,56 @@ io.on('connection', socket =>{
             insertFilmCategory("film_category",'film_id',"film",data.title,data.category);
             
             socket.emit('film deleted',"");
-            
-        });
+            insertIntoLog(data.email,"film","Insert",new Date(),"yes");
+        }).catch(error=>{
+            insertIntoLog(data.email,"film","Insert",new Date(),"no");
+        })
     });
 
     socket.on('modify film',data=>{
-        console.log(data);
         modifyFilm(data.title,data.description,data.release_year,data.language,data.length,data.rating,data.id).then(()=>{
             updateCategory('film_category','film_id',data.category,data.id);
             socket.emit('film deleted',"");
+            insertIntoLog(data.email,"film","Update",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data.email,"film","Update",new Date(),"no");
         })
     })
 
     socket.on('delete series',data=>{
-        deleteFromTable('series', "series.serie_id", data).then(()=>{
+        deleteFromTable('series', "series.serie_id", data[0]).then(()=>{
             socket.emit('series deleted',"")
+            insertIntoLog(data[1],"series","delete",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[1],"series","delete",new Date(),"no");
         })
     });
+
 
     socket.on('new series',data=>{
         insertNewSeries('series',data.title,data.description,data.release_year,data.language,data.rating).then(()=>{
             insertFilmCategory("serie_category",'serie_id',"series",data.title,data.category);
             socket.emit('series deleted',"");
-            
-        });
+
+            insertIntoLog(data.email,"series","Insert",new Date(),"yes");
+
+        }).catch(err=>{
+            insertIntoLog(data.email,"series","Insert",new Date(),"no");
+        })
     });
+
 
     socket.on('modify series',data=>{
         modifySeries(data.title,data.description,data.release_year,data.language,data.rating,data.id).then(()=>{
             updateCategory('serie_category','serie_id',data.category,data.id);
             socket.emit('series deleted',"");
+
+            insertIntoLog(data.email,"series","Update",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data.email,"series","Update",new Date(),"no");
         })
     })
+
 
     socket.on('getLanguages',data=>{
         getFromTable("language").then(languages=>{
@@ -281,9 +320,13 @@ io.on('connection', socket =>{
         });
     });
 
+
     socket.on('delete language',data=>{
         deleteFromTable("language","language.language_id",data).then(()=>{
             socket.emit('deleted language',"");
+            insertIntoLog(data[1],"language","delete",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[1],"language","delete",new Date(),"no");
         })
     });
 
@@ -296,16 +339,24 @@ io.on('connection', socket =>{
     
 
     socket.on('new language',data=>{
-        insertOneValue('language','name', data).then(()=>{
+        insertOneValue('language','name', data[0]).then(()=>{
             socket.emit('deleted language',"");
+            insertIntoLog(data[1],"language","Insert",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[1],"language","Insert",new Date(),"no");
         });
     });
 
+
     socket.on('new category',data=>{
-        insertOneValue('category','name', data).then(()=>{
+        insertOneValue('category','name', data[0]).then(()=>{
             socket.emit('deleted category','');
+            insertIntoLog(data[1],"category","Insert",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[1],"category","Insert",new Date(),"no");
         });
     });
+
 
     socket.on('getCountries',()=>{
         getFromTable('country').then(data=>{
@@ -314,27 +365,42 @@ io.on('connection', socket =>{
     });
 
     socket.on('delete country',data =>{
-        deleteFromTable('country','country_id',data).then(data=>{
+        deleteFromTable('country','country_id',data[0]).then(data=>{
             socket.emit('deleted country',"");
+            //insertIntoLog(data[1],"country","delete",new Date(),"yes");
+        }).catch(err=>{
+            //insertIntoLog(data[1],"country","delete",new Date(),"no");
         })
     });
 
+
     socket.on('new country',data=>{
-        insertOneValue('country','country', data).then(()=>{
+        insertOneValue('country','country', data[0]).then(()=>{
             socket.emit('deleted country','');
+            insertIntoLog(data[1],"country","Insert",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[1],"country","Insert",new Date(),"no");
         })
     });
+
 
     socket.on('new city',data=>{
         data = dataParser(data,",");
         insertCity(data[0],data[1]).then(()=>{
             socket.emit('deleted city','');
+            insertIntoLog(data[2],"city","Insert",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[2],"city","Insert",new Date(),"no");
         })
-    })
+    });
+
 
     socket.on('delete city',data=>{
-        deleteFromTable('city','city_id',data).then(()=>{
+        deleteFromTable('city','city_id',data[0]).then(()=>{
             socket.emit('deleted city',"")
+            insertIntoLog(data[1],"city","delete",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[1],"city","delete",new Date(),"no");
         })
     });
 
@@ -345,16 +411,24 @@ io.on('connection', socket =>{
     });
 
     socket.on('delete address',data=>{
-        deleteFromTable('address','address_id',data).then(results=>{
+        deleteFromTable('address','address_id',data[0]).then(results=>{
             socket.emit('deleted address',"");
+            insertIntoLog(data[1],"address","delete",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[1],"address","delete",new Date(),"no");
         })
     })
 
     socket.on('new address',data=>{
-        insertIntoAddress(data).then(results=>{
+        let array = [data[0],data[1],data[2],data[3],data[4]];
+        insertIntoAddress(array).then(results=>{
             socket.emit('deleted address',"");
-        })
+            insertIntoLog(data[5],"address","Insert",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[5],"address","Insert",new Date(),"no");
+        });
     })
+
 
     socket.on('getMostRent',data=>{
         let date = new Date();
@@ -381,6 +455,9 @@ io.on('connection', socket =>{
 
         deleteFromTable('customer',"customer_id",data[1]).then(data =>{
             socket.emit('customer deleted',"");
+            insertIntoLog(data[0],"customer","delete",new Date(),"yes");
+        }).catch(err =>{
+            insertIntoLog(data[0],"employee","delete",new Date(),"no");
         })
 
     });
@@ -396,6 +473,7 @@ io.on('connection', socket =>{
 
        deleteFromTable('employees','employees_id',data[1]).then(data =>{
            socket.emit('employee deleted',"");
+           insertIntoLog(data[0],"employee","delete",new Date(),"yes");
        });
     });
 
@@ -404,7 +482,11 @@ io.on('connection', socket =>{
         let datap = dataParser(data,",");
         
         insertIntoAdmin(datap[1]).then(res =>{
-            deleteFromTable('employees','employees_id',datap[1]).then()
+            deleteFromTable('employees','employees_id',datap[1]).then(()=>{
+                insertIntoLog(data[0],"employees","Update",new Date(),"yes");
+            }).catch(err =>{
+                insertIntoLog(data[0],"employees","Update",new Date(),"no");
+            })
             socket.emit('employee deleted',"");
         });
     });
@@ -412,7 +494,10 @@ io.on('connection', socket =>{
     socket.on('new employee',data =>{
         insertInto('employees',data[1].firstname,data[1].lastname,data[1].email).then(res =>{
             socket.emit('employee deleted',"");
-        })
+            insertIntoLog(data[0],"employee","Insert",new Date(),"yes");
+        }).catch(err =>{
+            insertIntoLog(data[0],"employee","Insert",new Date(),"no");
+        });
     });
 
 
@@ -422,14 +507,20 @@ io.on('connection', socket =>{
         })
     });
 
+
     socket.on('changeToEmployee',data =>{
         data = dataParser(data,",");
 
         insertIntoEmployee(data[1]).then(res =>{
-            deleteFromTable('administrator','admin_id',data[1]).then();
+            deleteFromTable('administrator','admin_id',data[1]).then(()=>{
+                insertIntoLog(data[0],"administrator","delete",new Date(),"yes");
+            }).catch(err =>{
+                insertIntoLog(data[0],"administrator","delete",new Date(),"no");
+            })
             socket.emit('admin deleted','')
         });
     });
+
 
     socket.on('getInfoAdmin',data =>{
         
@@ -438,9 +529,11 @@ io.on('connection', socket =>{
         });
     });
 
+
     socket.on("getAmount",data =>{
         socket.emit('takeAmount',PayAmount);
     });
+
 
     socket.on("changeAmount",data =>{ //data[0] email!!!
         
@@ -455,10 +548,11 @@ io.on('connection', socket =>{
         else{
             PayAmount.series.s = data[3];
         }
+
+        insertIntoLog(data[0],"PayAmount","Update",new Date(),"yes");
     });
 
     socket.on('modify customer',data=>{ //data[0] email!!!
-
         let choice; 
 
         if(data[1].choice == "Films and Series") choice = "FS";
@@ -468,6 +562,9 @@ io.on('connection', socket =>{
             modifyAddress(data[1].address,data[1].district,data[1].city,data[1].postalCode,data[1].phone,data[1].address_id).then(()=>{
                 socket.emit('modify customer',"");
             });
+            insertIntoLog(data[0],"customer","Update",new Date(),"yes");
+        }).catch(err=>{
+            insertIntoLog(data[0],"customer","Update",new Date(),"no");
         });
     });
 
@@ -482,8 +579,11 @@ io.on('connection', socket =>{
         newAddress(data[1].address,data[1].district,data[1].city,data[1].postalCode,data[1].phone).then(()=>{
             newCustomer(data[1].firstname,data[1].lastname,data[1].email,data[1].address,data[1].phone,date,choice).then(()=>{
                 socket.emit('new customer',"");
-            })
-        })
+                insertIntoLog(data[0],"customer","Insert",new Date(),"yes");
+            }).catch(()=>{
+                insertIntoLog(data[0],"customer","Insert",new Date(),"no");
+            });
+        });
     });
 });
 
@@ -591,7 +691,7 @@ function checkFilm(values) {
     return new Promise((resolve, reject) =>{
 
         connection.query(query, [values[0],values[1]], (err, results) =>{
-            if(err) throw err;
+            if(err) ;
 
             else {
                 if(results.length>0){
@@ -611,7 +711,7 @@ function insertRental(tableName,date_var,value1,value2,id){
     return new Promise((resolve, reject) =>{
 
         connection.query(query,[value1,value2],(err, results)=>{
-            if(err) throw err;
+            if(err) reject();
 
             else{
                 resolve();
@@ -627,7 +727,7 @@ function insertFilmPayment(value1,film_id,amount){
     return new Promise((resolve, reject) =>{
 
         connection.query(query,[value1,value1,film_id,amount],(err, results)=>{
-            if(err) throw err;
+            if(err) ;
 
             else{
                 resolve();
@@ -651,7 +751,7 @@ function getSeries(){
 
         connection.query(query,(err, results)=>{
 
-            if(err) throw err;
+            if(err) ;
 
             else{
                 resolve(JSON.parse(JSON.stringify(results)));
@@ -670,7 +770,7 @@ function getSeasons(serie_id){
 
         connection.query(query,serie_id,(err, results)=>{
 
-            if(err) throw err;
+            if(err) ;
 
             else{
                 resolve(JSON.parse(JSON.stringify(results)));
@@ -688,7 +788,7 @@ function getEpisodes(season_id) {
     return new Promise((resolve, reject) => {
         connection.query(query,season_id,(err, results)=>{
 
-            if(err) throw err;
+            if(err) ;
 
             else{
                 resolve(JSON.parse(JSON.stringify(results)));
@@ -705,7 +805,7 @@ function checkEpisode(customer_id,episode_id){
     return new Promise((resolve, reject) =>{
 
         connection.query(query, [customer_id,episode_id], (err, results) =>{
-            if(err) throw err;
+            if(err) ;
 
             else {
                 if(results.length>0){
@@ -727,7 +827,7 @@ function insertEpisodePayment(customer_id,episode_id,amount){
     return new Promise((resolve, reject) =>{
 
         connection.query(query,[customer_id,customer_id,episode_id,amount],(err, results)=>{
-            if(err) throw err;
+            if(err) ;
 
             else{
                 resolve();
@@ -741,9 +841,7 @@ function getOwnedStatus(results,customer_id){
         const episodesChecked = [];
         const array = results;
         for(let result of results){
-            //console.log(result.episode_id);
             checkEpisode(customer_id,result.episode_id).then(()=>{
-                //console.log("enter first");
                 episodesChecked.push({result,owned:true});
                 array.shift();
                 if(array.length == 0) resolve(episodesChecked);
@@ -807,8 +905,8 @@ function getOwnedEpisodes(customer_id){
 
 function getAccountInfo(customer_id){
 
-    let query = "select customer.first_name,customer.last_name,customer.email, customer.create_date,customer.active,customer.choice, "+
-    "address.address,address.district,city.city,country.country,address.postal_code, " +
+    let query = "select customer_id,customer.first_name,customer.last_name,customer.email, customer.create_date,customer.active,customer.choice, "+
+    "address.address_id,address.address,address.district,city.city,country.country,address.postal_code, " +
     "address.phone from customer " +
     "inner join address on address.address_id = customer.address_id " +
     "inner join city on address.city_id = city.city_id " +
@@ -872,6 +970,7 @@ function addactor(firstname,lastname) {
 
         connection.query(query,[firstname,lastname],(err, results)=>{
             
+            if(err) reject();
 
             resolve(results);
             
@@ -902,7 +1001,7 @@ function deleteFromTable(tableName,idname,id){
     return new Promise((resolve, reject) => {
 
         connection.query(query,id,(err, results)=>{
-            
+            if(err) reject();
             resolve(results);
             
         });
@@ -929,7 +1028,7 @@ function insertOneValue(tableName, valuename, value) {
 
     return new Promise((resolve, reject)=>{
         connection.query(query,value,(err, results)=>{
-            if(err) throw err;
+            if(err) reject();
 
             else resolve();
 
@@ -943,7 +1042,7 @@ function insertCity(city,country){
 
     return new Promise((resolve, reject) => {
         connection.query(query,[city,country],(err, results)=>{
-            if(err) throw err;
+            if(err) reject();
 
             else resolve();
         });
@@ -972,7 +1071,7 @@ function insertIntoAddress(array){
 
     return new Promise((resolve, reject) => {
         connection.query(query,array,(err, results)=>{
-            if(err) throw err;
+            if(err) reject();
 
             else resolve(JSON.parse(JSON.stringify(results)));
         });
@@ -986,7 +1085,7 @@ function insertNewFilm(tablename,title,description,release_year,language,length,
 
     return new Promise((resolve, reject) => {
         connection.query(query,[title,description,release_year,language,length,rating],(err, results)=>{
-            if(err) throw err;
+            if(err) reject();
             resolve(results);
         });
 
@@ -1012,7 +1111,7 @@ function insertNewSeries(tablename,title,description,release_year,language,ratin
 
     return new Promise((resolve, reject) => {
         connection.query(query,[title,description,release_year,language,rating],(err, results)=>{
-            if(err) throw err;
+            if(err) reject();
             resolve(results);
         });
 
@@ -1027,7 +1126,7 @@ function modifyFilm(title,description,release_year,language,length,rating,film_i
     return new Promise((resolve, reject) => {
 
         connection.query(query,[title,description,release_year,language,length,rating,film_id],(err, res) => {
-            if(err) throw err;
+            if(err) reject();
 
             else resolve(res);
         });
@@ -1056,7 +1155,7 @@ function modifySeries(title,description,release_year,language,rating,film_id){
     return new Promise((resolve, reject) => {
 
         connection.query(query,[title,description,release_year,language,rating,film_id],(err, res) => {
-            if(err) throw err;
+            if(err) reject();
 
             else resolve(res);
         });
@@ -1187,7 +1286,7 @@ function modifyCustomer(firstname,lastname,email,choice,customer_id){
 
         connection.query(query,[firstname,lastname,email,choice,customer_id],(err, results)=>{
 
-            if(err) throw err;
+            if(err) reject();
             resolve(results);
         });
     });
@@ -1228,6 +1327,22 @@ function newCustomer(firstname,lastname,email,address,phone,create_date,choice){
     return new Promise((resolve, reject) => {
 
         connection.query(query,[firstname,lastname,email,address,phone,create_date,choice],(err, results)=>{
+            if(err) reject();
+            resolve(results);
+        });
+    });
+}
+
+
+function insertIntoLog(username,tableName,action,date,success) {
+
+    let query = "Insert into log(username,table_name,action,action_date,success) "+
+    "values(?,?,?,?,?) ON DUPLICATE KEY UPDATE " +
+    "username = ?, table_name = ?, action = ?, action_date = ?, success = ?"
+
+    return new Promise((resolve, reject) => {
+
+        connection.query(query,[username,tableName,action,date,success,username,tableName,action,date,success],(err, results)=>{
             if(err) throw err;
             resolve(results);
         });

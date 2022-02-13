@@ -75,18 +75,16 @@ drop table if exists film_actor;
 CREATE TABLE film_actor (
     actor_id SMALLINT UNSIGNED NOT NULL,
     film_id SMALLINT UNSIGNED NOT NULL,
-    PRIMARY KEY(actor_id,film_id),
-    CONSTRAINT fk_film_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE cascade ON UPDATE CASCADE,
-    CONSTRAINT fk_film_actor_film FOREIGN KEY (film_id) REFERENCES film (film_id) ON DELETE cascade ON UPDATE CASCADE
+    Constraint fkf_film_id FOREIGN key(film_id) REFERENCES film(film_id) ON DELETE cascade ON UPDATE CASCADE,
+    CONSTRAINT fk_film_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE cascade ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 drop table if exists serie_actor;
 CREATE TABLE serie_actor (
     actor_id SMALLINT UNSIGNED NOT NULL,
     serie_id SMALLINT UNSIGNED NOT NULL,
-    PRIMARY KEY(actor_id,serie_id),
-    CONSTRAINT fk_serie_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE cascade ON UPDATE CASCADE,
-    CONSTRAINT fk_serie_actor_serie FOREIGN KEY (serie_id) REFERENCES series (serie_id) ON DELETE cascade ON UPDATE CASCADE
+    Constraint fks_film_id FOREIGN key(serie_id) REFERENCES series(serie_id) ON DELETE cascade ON UPDATE CASCADE,
+    CONSTRAINT fk_serie_actor_actor FOREIGN KEY (actor_id) REFERENCES actor (actor_id) ON DELETE cascade ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 
@@ -219,7 +217,7 @@ create table episode_rental(
 
 drop table if exists film_payment;
 create table film_payment (
-    film_payment_id smallint not null auto_increment,
+    film_payment_id smallint  auto_increment,
     customer_id smallint unsigned NOT NULL,
     film_rental_id smallint not null,
     film_amount decimal(5,2) not null,
@@ -245,34 +243,11 @@ create table episode_payment(
 -----------------LOG------------------------------
 drop table if exists log;
 create table log(
-    username SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    username varchar(50),
     table_name VARCHAR(20) NOT NULL,
     action VARCHAR(30),
     action_date DATETIME,
     success ENUM('yes', 'no'),
     PRIMARY KEY(username),
-    CONSTRAINT log_user FOREIGN KEY (username) REFERENCES customer(customer_id) ON DELETE CASCADE ON UPDATE CASCADE
+    unique(username)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

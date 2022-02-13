@@ -1659,3 +1659,14 @@ INSERT INTO `episode_payment` (`episode_payment_id`, `customer_id`, `episode_ren
 (3000, 512, 8000, '0.20', '2005-07-07 20:09:01'),
 (3200, 309, 9000, '0.20', '2005-08-22 18:22:44'),
 (3400, 142, 15422, '0.20', '2005-08-21 19:39:28');
+
+
+Insert into employees(first_name, last_name,email) values
+("employee_example1","ex1_lastname","ex1@sakilaemployee.org"),
+("employee_example2","ex2_lastname","ex2@sakilaemployee.org")
+
+
+Insert into administrator(first_name, last_name,email) values
+("admin_example1","admin1_lastname","admin1@sakilaadmin.org"),
+("admin_example2","admin2_lastname","admin@sakilaadmin.org"),
+("admin_example3","admin3_lastname","admin3@sakilaadmin.org")
