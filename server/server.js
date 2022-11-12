@@ -711,7 +711,10 @@ function insertRental(tableName,date_var,value1,value2,id){
     return new Promise((resolve, reject) =>{
 
         connection.query(query,[value1,value2],(err, results)=>{
-            if(err) reject();
+            if(err) {
+                throw err;
+                reject();
+            }
 
             else{
                 resolve();

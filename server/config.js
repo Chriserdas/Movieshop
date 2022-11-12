@@ -2,7 +2,7 @@ let config = {
     host:"localhost",
     user:"root",
     database:"tvondemand",
-    password:"password",
+    password:"greekranker2",
 };
 
 module.exports = config;

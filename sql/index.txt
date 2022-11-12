@@ -1,0 +1,32 @@
+---STORED PROCEDURE 3.1
+λόγω οτι είναι ερώτημα εύρους μεταξυ ημερομηνιών θα χρησιμοποιήσω ευρετήριου B-Tree
+
+CREATE INDEX date_film_idx
+USING BTREE
+ON film_rental(film_rental_date);
+
+CREATE INDEX date_serie_idx
+USING BTREE
+ON episode_rental(episode_rental_date);
+
+---STORED PROCEDURE 3.2
+λόγω οτι είναι ερώτημα ισότητας θα χρησιμοποιήσω ευρετήριο hash ομως χρησιμοποιούμε την ENGINE=InnoDB η οποία δεν δέχεται
+το hash εαν αλλάξουμε στην ENGINE=Memory που είναι για το hash θα έχουμε θέμα στην εισαγωγή VARCHAR και TEXT διότι δεν τα 
+δεχεται επομένως γράφουμε πως θα ήταν με hash
+
+CREATE INDEX customer_idx
+USING HASH
+ON customer(email);
+
+---STORED PROCEDURE 3.4A
+λόγω εύρους επωνυμάτων θα χρησιμοποιήσω BTREE
+CREATE INDEX last_name_idx
+USING BTREE
+ON actor(last_name);
+
+
+--- STORED PROCEDURE 3.4B
+λόγω ισότητας εδώ θα χρησιμοποιήσω hash αλλα για τον λόγο που ανέφερα και απο πανω απλα παραθετω 
+CREATE INDEX customer_last_idx
+USING HASH
+ON customer(last_name);

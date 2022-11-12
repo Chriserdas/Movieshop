@@ -1,7 +1,6 @@
 {
   "name": "js",
   "version": "1.0.0",
-  "description": "",
   "type": "commonjs",
   "main": "main.js",
   "scripts": {
@@ -17,5 +16,6 @@
   "dependencies": {
     "@electron/remote": "^2.0.1",
     "electron-remote": "^1.3.0"
-  }
+  },
+  "description": ""
 }
